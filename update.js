@@ -93,6 +93,19 @@ document.getElementById("update-form").addEventListener("submit", async (e) => {
       prescriptions
     });
     document.getElementById("message").innerText = "Records updated successfully!";
+
+    // ✅ Send email alert using EmailJS
+    emailjs.send("service_fwqcg5u", "template_ee8zwdl", {
+      patient_id: patientId,
+      message: `Prescription updated for ${patientId}. Please check ward panel.`,
+      doctor: "Doctor 1"
+    })
+    .then(function(response) {
+      console.log("✅ Email sent!", response.status, response.text);
+    }, function(error) {
+      console.error("❌ Failed to send email:", error);
+    });
+
   } catch (err) {
     document.getElementById("message").innerText = "Error updating: " + err.message;
   }
