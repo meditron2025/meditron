@@ -1,0 +1,186 @@
+/* === Reset & Base === */
+* {
+  box-sizing: border-box;
+}
+
+body, html {
+  height: 100%;
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-image: url('https://cdn.glitch.global/6188b4b5-e0cf-42bf-a732-68667bdee442/WhatsApp%20Image%202025-06-29%20at%2021.06.02_7cdcf69e.jpg?v=1751211437801');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+/* === Login Container === */
+.login-container {
+  background: rgba(255, 255, 255, 0.85);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  text-align: center;
+  width: 300px;
+}
+
+/* === Login Title === */
+.login-title {
+  font-size: 22px;
+  margin-bottom: 20px;
+  color: #023e8a;
+}
+
+.neomedix {
+  font-size: 20px;
+  color: #8a9097;
+}
+
+/* === Inputs === */
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+/* === Login Button === */
+button {
+  width: 100%;
+  padding: 10px;
+  background-color: #0077b6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+button:hover {
+  background-color: #005f8a;
+}
+
+/* === Message === */
+#message {
+  margin-top: 12px;
+  color: red;
+  font-weight: bold;
+}
+
+/* === Logo === */
+.meditron-logo {
+  width: 560px;
+  height: auto;
+  display: block;
+  margin: 0 auto 20px auto;
+}
+
+/* === Dashboard Container === */
+.dashboard-container {
+  background: rgba(255, 255, 255, 0.88);
+  padding: 40px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 900px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+  backdrop-filter: blur(8px);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.dashboard-title {
+  font-size: 28px;
+  color: #023e8a;
+  margin-bottom: 8px;
+}
+
+.dashboard-subtitle {
+  font-size: 18px;
+  color: #03045e;
+  margin-bottom: 20px;
+}
+
+.dashboard-neomedix {
+  font-size: 22px;
+  color: #8a9097;
+}
+
+.logged-in-doctor {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.patient-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 20px;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.patient-button {
+  padding: 15px;
+  background-color: #0077b6;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.patient-button:hover {
+  background-color: #005f8a;
+  transform: scale(1.05);
+}
+.patient-container {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  background: #f8f8f8;
+  border-radius: 10px;
+}
+
+#prescription-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+#prescription-table th, #prescription-table td {
+  border: 1px solid #aaa;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+#prescription-table th {
+  background-color: #e0f2f1;
+}
+.logout-btn {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.logout-btn:hover {
+  background-color: #c0392b;
+}
+
+

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login to Meditron by NeoMedix</title>
+    <link rel="stylesheet" href="style.css" />
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  </head>
+  <body>
+    <!-- LOGO -->
+    <div class="logo-container">
+      <img
+        src="https://cdn.glitch.global/6188b4b5-e0cf-42bf-a732-68667bdee442/WhatsApp%20Image%202025-06-29%20at%2012.41.09_0ec5adb6.jpg?v=1751181204512"
+        alt="Meditron by NeoMedix Logo"
+        class="meditron-logo"
+      />
+    </div>
+
+    <div class="login-container">
+      <h1 class="login-title">
+        Login to Meditron by <span class="neomedix">NeoMedix</span>
+      </h1>
+
+      <div class="form">
+        <input type="email" id="email" placeholder="Email" /><br />
+        <input type="password" id="password" placeholder="Password" /><br />
+        <button onclick="login()">Login</button>
+      </div>
+
+      <p id="message"></p>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Update Patient Records</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+    }
+
+    h1 {
+      color: #0A5275;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0;
+    }
+
+    input[type="text"] {
+      padding: 6px;
+      width: 250px;
+    }
+
+    .logout-btn {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      padding: 8px 16px;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .logout-btn:hover {
+      background-color: #c82333;
+    }
+
+    button[type="submit"] {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      font-weight: bold;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #218838;
+    }
+
+    #message {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <button class="logout-btn" onclick="logout()">Logout</button>
+
+  <h1>Update Medical Records</h1>
+  <form id="update-form">
+    <label>Diagnosis:<br>
+      <input type="text" id="diagnosis" name="diagnosis" required>
+    </label>
+
+    <h3>Prescriptions:</h3>
+    <div id="medications"></div>
+
+    <button type="submit">Save Records</button>
+  </form>
+
+  <p id="message"></p>
+
+  <!-- ✅ JS FILE (must come last) -->
+  <script src="update.js"></script>
+
+  <!-- 🔒 Logout functionality -->
+  <script>
+    function logout() {
+      sessionStorage.clear();
+      localStorage.clear();
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>

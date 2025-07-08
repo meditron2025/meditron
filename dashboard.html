@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Meditron Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <div class="dashboard-container">
+    <h1 class="dashboard-title">
+      Welcome to Meditron by <span class="dashboard-neomedix">NeoMedix</span>
+    </h1>
+
+    <p class="dashboard-subtitle">-Success access to smarter healthcare-</p>
+
+    <p class="logged-in-doctor">Logged in as: doctor1@meditron.com</p>
+
+    <button onclick="logout()">Logout</button>
+
+    <h3 style="margin-top: 30px;">Click on a Patient</h3>
+
+    <div class="patient-grid">
+      <button class="patient-button">patient1</button>
+      <button class="patient-button">patient2</button>
+      <button class="patient-button">patient3</button>
+      <button class="patient-button">patient4</button>
+      <button class="patient-button">patient5</button>
+      <button class="patient-button">patient6</button>
+    </div>
+  </div>
+
+  <script>
+    // Assign click actions to each patient button
+    const buttons = document.querySelectorAll(".patient-button");
+
+    buttons.forEach((button, index) => {
+      button.addEventListener("click", () => {
+        const patientId = `patient${index + 1}`;
+        window.location.href = `patient.html?patientId=${patientId}`;
+      });
+    });
+
+    function logout() {
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>

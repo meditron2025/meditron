@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Patient Details</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <h1>Patient Details</h1>
+  <div id="patient-info" style="margin: 20px; padding: 10px;"></div>
+
+  <button id="update-btn" style="display:none; padding: 10px 20px; background-color: teal; color: white; border: none; border-radius: 5px; cursor: pointer;">
+    Update Medical Records
+  </button>
+
+  <p id="error-message" style="color:red;"></p>
+  <br>
+  <button onclick="window.location.href='dashboard.html'" style="margin: 10px;">⬅ Back to Dashboard</button>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCe9mUjwaZvPPpnPwfm6Xcd1uutJLzev10",
+      authDomain: "meditron-pill-dispenser.firebaseapp.com",
+      projectId: "meditron-pill-dispenser",
+      storageBucket: "meditron-pill-dispenser.appspot.com",
+      messagingSenderId: "582584026049",
+      appId: "1:582584026049:web:dacbe477519dbfa978e540"
+    };
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const params = new URLSearchParams(window.location.search);
+    const patientId = params.get("patientId");
+
+    if (!patientId) {
+      document.getElementById("error-message").innerText = "Patient ID missing.";
+    } else {
+      db.collection("patients").doc(patientId).get()
+        .then(doc => {
+          if (!doc.exists) {
+            document.getElementById("error-message").innerText = "Patient data not found in database.";
+            return;
+          }
+
+          const data = doc.data();
+
+          let prescriptionHtml = "<h3 style='margin-top: 20px;'>Prescription</h3>";
+if (Array.isArray(data.prescriptions) && data.prescriptions.length > 0) {
+  prescriptionHtml += `
+    <table style="border-collapse: collapse; width: 100%; margin-top: 10px; box-shadow: 0 0 8px rgba(0,0,0,0.1);">
+      <thead>
+        <tr style="background-color: #e0f7fa;">
+          <th style="border: 1px solid #ccc; padding: 10px;">Medication</th>
+          <th style="border: 1px solid #ccc; padding: 10px;">Dose</th>
+          <th style="border: 1px solid #ccc; padding: 10px;">Time</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+  data.prescriptions.forEach(p => {
+    prescriptionHtml += `
+      <tr>
+        <td style="border: 1px solid #ccc; padding: 10px;">${p.name}</td>
+        <td style="border: 1px solid #ccc; padding: 10px;">${p.dose || 'N/A'}</td>
+        <td style="border: 1px solid #ccc; padding: 10px;">${(p.times || []).join(', ') || 'N/A'}</td>
+      </tr>
+    `;
+  });
+  prescriptionHtml += "</tbody></table>";
+} else {
+  prescriptionHtml = "<p style='color: gray;'>No prescriptions available.</p>";
+}
+
+const infoDiv = document.getElementById("patient-info");
+infoDiv.innerHTML = `
+  <div style="border: 1px solid #ccc; border-radius: 8px; padding: 20px; background-color: #f9f9f9; max-width: 600px;">
+    <h2 style="color: #00796b;">Patient ID: ${patientId}</h2>
+    <p><strong>Name:</strong> ${data.name}</p>
+    <p><strong>Age:</strong> ${data.age}</p>
+    <p><strong>Gender:</strong> ${data.gender}</p>
+    <p><strong>Diagnosis:</strong> ${data.diagnosis || 'N/A'}</p>
+    ${prescriptionHtml}
+  </div>
+`;
+
+
+          document.getElementById("update-btn").style.display = "inline-block";
+          document.getElementById("update-btn").onclick = function () {
+            window.location.href = `update.html?patientId=${patientId}`;
+          };
+        })
+        .catch(err => {
+          document.getElementById("error-message").innerText = "Error loading patient data: " + err.message;
+        });
+    }
+  </script>
+</body>
+</html>
+
