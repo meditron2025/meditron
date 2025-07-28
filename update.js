@@ -8,6 +8,7 @@ const firebaseConfig = {
   appId: "1:582584026049:web:dacbe477519dbfa978e540"
 };
 
+// Initialize Firebase
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
@@ -27,7 +28,7 @@ async function loadForm() {
   const docSnap = await docRef.get();
 
   if (!docSnap.exists) {
-    document.getElementById("message").innerText = "Patient not found!";
+    document.getElementById("message").innerText = "❌ Patient not found!";
     return;
   }
 
@@ -35,10 +36,10 @@ async function loadForm() {
   const existingPrescriptions = data.prescriptions || [];
   const diagnosis = data.diagnosis || "";
 
-  // Fill existing diagnosis
+  // Set existing diagnosis
   document.getElementById("diagnosis").value = diagnosis;
 
-  // Create form
+  // Create medication inputs
   const medDiv = document.getElementById("medications");
 
   meds.forEach(med => {
@@ -63,14 +64,14 @@ async function loadForm() {
 
 window.onload = loadForm;
 
-// Submit form
+// Handle form submit
 document.getElementById("update-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   const diagnosis = document.getElementById("diagnosis").value.trim();
-
   const formData = new FormData(e.target);
   const prescriptions = [];
 
+  // Collect selected medications
   meds.forEach(med => {
     if (formData.getAll("med").includes(med)) {
       const dose = formData.get(`dose-${med}`) || "";
@@ -79,34 +80,26 @@ document.getElementById("update-form").addEventListener("submit", async (e) => {
       if (formData.get(`time-${med}-afternoon`)) times.push("Afternoon");
       if (formData.get(`time-${med}-night`)) times.push("Night");
 
-      prescriptions.push({
-        name: med,
-        dose,
-        times
-      });
+      prescriptions.push({ name: med, dose, times });
     }
   });
 
-  try {
-    await db.collection("patients").doc(patientId).update({
-      diagnosis,
-      prescriptions
-    });
-    document.getElementById("message").innerText = "Records updated successfully!";
+ try {
+  await db.collection("patients").doc(patientId).update({
+    diagnosis,
+    prescriptions
+  });
 
-    // ✅ Send email alert using EmailJS
-    emailjs.send("service_fwqcg5u", "template_ee8zwdl", {
-      patient_id: patientId,
-      message: `Prescription updated for ${patientId}. Please check ward panel.`,
-      doctor: "Doctor 1"
-    })
-    .then(function(response) {
-      console.log("✅ Email sent!", response.status, response.text);
-    }, function(error) {
-      console.error("❌ Failed to send email:", error);
-    });
-
-  } catch (err) {
-    document.getElementById("message").innerText = "Error updating: " + err.message;
+  // ✅ No error so far, safe to update the message
+  const msgEl = document.getElementById("message");
+  if (msgEl) {
+    msgEl.innerText = "✅ Records updated successfully!";
   }
-});
+} catch (err) {
+  console.error("🔥 Error updating:", err);
+  const msgEl = document.getElementById("message");
+  if (msgEl) {
+    msgEl.innerText = "❌ Error updating: " + (err?.message || "Unknown error");
+  }
+}
+
