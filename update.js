@@ -1,113 +1,138 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getFirestore,
   doc,
   getDoc,
   updateDoc
-} from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
+  // 🔁 Replace with your actual config
   apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  authDomain: "YOUR_AUTH_DOMAIN",
   projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  storageBucket: "YOUR_STORAGE_BUCKET",
   messagingSenderId: "YOUR_SENDER_ID",
   appId: "YOUR_APP_ID"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Get patient ID from URL
-const urlParams = new URLSearchParams(window.location.search);
-const patientId = urlParams.get("patientId");
-
-// Form and message reference
-const form = document.getElementById("update-form");
-const msg = document.getElementById("message");
-const diagnosisField = document.getElementById("diagnosis");
-
 // Medications list
 const medications = [
-  "Panadol",
-  "Losartan",
-  "Metformin",
-  "Aspirin",
-  "Clopidogrel",
-  "Statin",
-  "Penicillin",
-  "Diuretics",
-  "Sulfonylurea"
+  "Panadol", "Losartan", "Metformin", "Aspirin", "Clopidogrel",
+  "Statin", "Penicillin", "Diuretics", "Sulfonylurea"
 ];
 
-// Load existing data
+// Step 1: Generate medication fields dynamically
+function createMedicationFields() {
+  const container = document.getElementById("medications");
+  medications.forEach((med) => {
+    container.innerHTML += `
+      <div class="medication-group">
+        <input type="checkbox" id="${med}-check">
+        <label for="${med}-check">${med}</label><br>
+        <div class="dose">
+          Dose: <input type="text" id="${med}-dose" placeholder="e.g., 500mg"><br>
+        </div>
+        <div class="times">
+          Time:
+          <input type="checkbox" name="${med}-time" value="Morning"> Morning
+          <input type="checkbox" name="${med}-time" value="Afternoon"> Afternoon
+          <input type="checkbox" name="${med}-time" value="Night"> Night
+        </div>
+      </div>
+    `;
+  });
+}
+
+// Step 2: Load current patient data
 async function loadPatientData() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const patientId = urlParams.get("patientId");
+
+  if (!patientId) {
+    document.getElementById("message").textContent = "Invalid patient ID.";
+    return;
+  }
+
   const docRef = doc(db, "patients", patientId);
   const docSnap = await getDoc(docRef);
 
   if (docSnap.exists()) {
     const data = docSnap.data();
 
-    // Load diagnosis
-    diagnosisField.value = data.diagnosis || "";
+    // Populate diagnosis
+    document.getElementById("diagnosis").value = data.diagnosis || "";
 
-    // Load prescriptions
-    const prescriptions = data.prescriptions || [];
-    prescriptions.forEach((med) => {
-      const checkbox = document.getElementById(`${med.name}-check`);
-      const doseInput = document.getElementById(`${med.name}-dose`);
-      const timeInputs = document.querySelectorAll(`input[name="${med.name}-time"]`);
+    // Populate medications
+    if (data.prescriptions && Array.isArray(data.prescriptions)) {
+      data.prescriptions.forEach((med) => {
+        if (document.getElementById(`${med.name}-check`)) {
+          document.getElementById(`${med.name}-check`).checked = true;
+          document.getElementById(`${med.name}-dose`).value = med.dose || "";
 
-      if (checkbox) checkbox.checked = true;
-      if (doseInput) doseInput.value = med.dose;
-
-      timeInputs.forEach((timeInput) => {
-        if (med.times && med.times.includes(timeInput.value)) {
-          timeInput.checked = true;
+          med.times?.forEach((time) => {
+            const timeBoxes = document.getElementsByName(`${med.name}-time`);
+            timeBoxes.forEach((box) => {
+              if (box.value === time) {
+                box.checked = true;
+              }
+            });
+          });
         }
       });
-    });
+    }
+  } else {
+    document.getElementById("message").textContent = "Patient not found.";
   }
 }
 
-loadPatientData();
-
-// Handle form submission
-form.addEventListener("submit", async (e) => {
+// Step 3: Save updated data
+document.getElementById("update-form").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const prescriptions = [];
 
-  const diagnosis = diagnosisField.value.trim();
+  const urlParams = new URLSearchParams(window.location.search);
+  const patientId = urlParams.get("patientId");
+
+  const diagnosis = document.getElementById("diagnosis").value.trim();
+
+  const updatedPrescriptions = [];
 
   medications.forEach((med) => {
     const isChecked = document.getElementById(`${med}-check`).checked;
     if (isChecked) {
       const dose = document.getElementById(`${med}-dose`).value.trim();
-      const timeCheckboxes = document.querySelectorAll(`input[name="${med}-time"]:checked`);
-      const times = Array.from(timeCheckboxes).map(cb => cb.value);
+      const timeBoxes = document.getElementsByName(`${med}-time`);
+      const selectedTimes = [];
+      timeBoxes.forEach((box) => {
+        if (box.checked) selectedTimes.push(box.value);
+      });
 
-      prescriptions.push({
+      updatedPrescriptions.push({
         name: med,
         dose,
-        times
+        times: selectedTimes
       });
     }
   });
 
   try {
     await updateDoc(doc(db, "patients", patientId), {
-      diagnosis,
-      prescriptions
+      diagnosis: diagnosis,
+      prescriptions: updatedPrescriptions
     });
 
-    msg.style.color = "green";
-    msg.innerText = "Records updated successfully!";
+    document.getElementById("message").style.color = "green";
+    document.getElementById("message").textContent = "Records updated successfully!";
   } catch (error) {
-    msg.style.color = "red";
-    msg.innerText = "Error updating: " + error.message;
-    console.error("Update error:", error);
+    document.getElementById("message").style.color = "red";
+    document.getElementById("message").textContent = "Error updating records.";
+    console.error("Error updating:", error);
   }
 });
 
-
+// Load everything
+createMedicationFields();
+loadPatientData();
