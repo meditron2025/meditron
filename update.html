@@ -1,205 +1,118 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Update Patient Records</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Update Prescription</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  <script src="https://cdn.emailjs.com/dist/email.min.js"></script> <!-- EmailJS CDN -->
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 40px;
-    }
-
-    h1 {
-      color: #0A5275;
-    }
-
-    label {
-      display: block;
-      margin: 10px 0;
-    }
-
-    input[type="text"] {
-      padding: 6px;
-      width: 250px;
-    }
-
-    .logout-btn {
-      position: absolute;
-      top: 20px;
-      right: 30px;
-      padding: 8px 16px;
-      background-color: #dc3545;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .logout-btn:hover {
-      background-color: #c82333;
-    }
-
-    button[type="submit"] {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-      font-weight: bold;
-      background-color: #28a745;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    button[type="submit"]:hover {
-      background-color: #218838;
-    }
-
-    #message {
-      margin-top: 20px;
-      font-weight: bold;
-    }
-  </style>
 </head>
 <body>
-  <button class="logout-btn" onclick="logout()">Logout</button>
+  <div class="container">
+    <h1>Update Prescription</h1>
+    <form id="update-form">
+      <label for="diagnosis">Diagnosis:</label><br>
+      <textarea name="diagnosis" id="diagnosis" rows="3" required></textarea><br><br>
 
-  <h1>Update Medical Records</h1>
-  <form id="update-form">
-    <label>Diagnosis:<br>
-      <input type="text" id="diagnosis" name="diagnosis" required>
-    </label>
+      <h3>Medications:</h3>
+      <div id="medications">
+        <!-- Medication Blocks -->
+        <div>
+          <label><input type="checkbox" name="med" value="Panadol"> Panadol</label><br>
+          Dose: <input type="text" name="dose-Panadol"><br>
+          Time:
+          <label><input type="checkbox" name="time-Panadol-morning"> Morning</label>
+          <label><input type="checkbox" name="time-Panadol-afternoon"> Afternoon</label>
+          <label><input type="checkbox" name="time-Panadol-night"> Night</label>
+          <hr>
+        </div>
 
-    <h3>Prescriptions:</h3>
-    <div id="medications"></div>
+        <div>
+          <label><input type="checkbox" name="med" value="Losartan"> Losartan</label><br>
+          Dose: <input type="text" name="dose-Losartan"><br>
+          Time:
+          <label><input type="checkbox" name="time-Losartan-morning"> Morning</label>
+          <label><input type="checkbox" name="time-Losartan-afternoon"> Afternoon</label>
+          <label><input type="checkbox" name="time-Losartan-night"> Night</label>
+          <hr>
+        </div>
 
-    <button type="submit">Save Records</button>
-  </form>
+        <div>
+          <label><input type="checkbox" name="med" value="Metformin"> Metformin</label><br>
+          Dose: <input type="text" name="dose-Metformin"><br>
+          Time:
+          <label><input type="checkbox" name="time-Metformin-morning"> Morning</label>
+          <label><input type="checkbox" name="time-Metformin-afternoon"> Afternoon</label>
+          <label><input type="checkbox" name="time-Metformin-night"> Night</label>
+          <hr>
+        </div>
 
-  <p id="message"></p>
+        <div>
+          <label><input type="checkbox" name="med" value="Aspirin"> Aspirin</label><br>
+          Dose: <input type="text" name="dose-Aspirin"><br>
+          Time:
+          <label><input type="checkbox" name="time-Aspirin-morning"> Morning</label>
+          <label><input type="checkbox" name="time-Aspirin-afternoon"> Afternoon</label>
+          <label><input type="checkbox" name="time-Aspirin-night"> Night</label>
+          <hr>
+        </div>
 
-  <!-- ✅ JavaScript logic -->
-  <script>
-    // Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyCe9mUjwaZvPPpnPwfm6Xcd1uutJLzev10",
-      authDomain: "meditron-pill-dispenser.firebaseapp.com",
-      projectId: "meditron-pill-dispenser",
-      storageBucket: "meditron-pill-dispenser.appspot.com",
-      messagingSenderId: "582584026049",
-      appId: "1:582584026049:web:dacbe477519dbfa978e540"
-    };
+        <div>
+          <label><input type="checkbox" name="med" value="Clopidogrel"> Clopidogrel</label><br>
+          Dose: <input type="text" name="dose-Clopidogrel"><br>
+          Time:
+          <label><input type="checkbox" name="time-Clopidogrel-morning"> Morning</label>
+          <label><input type="checkbox" name="time-Clopidogrel-afternoon"> Afternoon</label>
+          <label><input type="checkbox" name="time-Clopidogrel-night"> Night</label>
+          <hr>
+        </div>
 
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+        <div>
+          <label><input type="checkbox" name="med" value="Statin"> Statin</label><br>
+          Dose: <input type="text" name="dose-Statin"><br>
+          Time:
+          <label><input type="checkbox" name="time-Statin-morning"> Morning</label>
+          <label><input type="checkbox" name="time-Statin-afternoon"> Afternoon</label>
+          <label><input type="checkbox" name="time-Statin-night"> Night</label>
+          <hr>
+        </div>
 
-    // Init EmailJS
-    emailjs.init("mnASVO8PNseYO9O1D");
+        <div>
+          <label><input type="checkbox" name="med" value="Penicillin"> Penicillin</label><br>
+          Dose: <input type="text" name="dose-Penicillin"><br>
+          Time:
+          <label><input type="checkbox" name="time-Penicillin-morning"> Morning</label>
+          <label><input type="checkbox" name="time-Penicillin-afternoon"> Afternoon</label>
+          <label><input type="checkbox" name="time-Penicillin-night"> Night</label>
+          <hr>
+        </div>
 
-    // Medication list
-    const meds = [
-      "Panadol", "Losartan", "Metformin", "Aspirin", "Clopidogrel",
-      "Statin", "Penicillin", "Diuretics", "Sulfonylurea"
-    ];
+        <div>
+          <label><input type="checkbox" name="med" value="Diuretics"> Diuretics</label><br>
+          Dose: <input type="text" name="dose-Diuretics"><br>
+          Time:
+          <label><input type="checkbox" name="time-Diuretics-morning"> Morning</label>
+          <label><input type="checkbox" name="time-Diuretics-afternoon"> Afternoon</label>
+          <label><input type="checkbox" name="time-Diuretics-night"> Night</label>
+          <hr>
+        </div>
 
-    // Get patientId from URL
-    const params = new URLSearchParams(window.location.search);
-    const patientId = params.get("patientId");
+        <div>
+          <label><input type="checkbox" name="med" value="Sulfonylurea"> Sulfonylurea</label><br>
+          Dose: <input type="text" name="dose-Sulfonylurea"><br>
+          Time:
+          <label><input type="checkbox" name="time-Sulfonylurea-morning"> Morning</label>
+          <label><input type="checkbox" name="time-Sulfonylurea-afternoon"> Afternoon</label>
+          <label><input type="checkbox" name="time-Sulfonylurea-night"> Night</label>
+          <hr>
+        </div>
+      </div>
 
-    // Load existing data and generate form
-    async function loadForm() {
-      const docRef = db.collection("patients").doc(patientId);
-      const docSnap = await docRef.get();
+      <button type="submit">Save Records</button>
+    </form>
+    <p id="status"></p>
+    <a href="dashboard.html">← Back to Dashboard</a>
+  </div>
 
-      if (!docSnap.exists) {
-        document.getElementById("message").innerText = "Patient not found!";
-        return;
-      }
-
-      const data = docSnap.data();
-      const existingPrescriptions = data.prescriptions || [];
-      const diagnosis = data.diagnosis || "";
-
-      // Fill existing diagnosis
-      document.getElementById("diagnosis").value = diagnosis;
-
-      // Create form
-      const medDiv = document.getElementById("medications");
-
-      meds.forEach(med => {
-        const existing = existingPrescriptions.find(p => p.name === med);
-        const dose = existing?.dose || "";
-        const times = existing?.times || [];
-
-        const html = `
-          <div style="margin-bottom: 10px;">
-            <label style="display: flex; align-items: center; gap: 10px;">
-              <input type="checkbox" name="med" value="${med}" ${existing ? "checked" : ""}> <strong>${med}</strong>
-              Dose: <input type="text" name="dose-${med}" value="${dose}" placeholder="e.g. 500mg" style="width: 100px;">
-              Time:
-              <label><input type="checkbox" name="time-${med}-morning" ${times.includes("Morning") ? "checked" : ""}> M</label>
-              <label><input type="checkbox" name="time-${med}-afternoon" ${times.includes("Afternoon") ? "checked" : ""}> A</label>
-              <label><input type="checkbox" name="time-${med}-night" ${times.includes("Night") ? "checked" : ""}> N</label>
-            </label>
-          </div>`;
-        medDiv.insertAdjacentHTML('beforeend', html);
-      });
-    }
-
-    window.onload = loadForm;
-
-    // Submit form
-    document.getElementById("update-form").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const diagnosis = document.getElementById("diagnosis").value.trim();
-      const formData = new FormData(e.target);
-      const prescriptions = [];
-
-      meds.forEach(med => {
-        if (formData.getAll("med").includes(med)) {
-          const dose = formData.get(`dose-${med}`) || "";
-          const times = [];
-          if (formData.get(`time-${med}-morning`)) times.push("Morning");
-          if (formData.get(`time-${med}-afternoon`)) times.push("Afternoon");
-          if (formData.get(`time-${med}-night`)) times.push("Night");
-
-          prescriptions.push({ name: med, dose, times });
-        }
-      });
-
-      try {
-        await db.collection("patients").doc(patientId).update({
-          diagnosis,
-          prescriptions
-        });
-
-        // Send Email Notification via EmailJS
-        const emailParams = {
-          patient_id: patientId,
-          diagnosis: diagnosis,
-          prescription_summary: prescriptions.map(p => 
-            `${p.name} (${p.dose}) - ${p.times.join(", ")}`
-          ).join("\n")
-        };
-
-        await emailjs.send("service_fwqcg5u", "template_ee8zwdl", emailParams);
-
-        document.getElementById("message").innerText = "Records updated and email sent!";
-      } catch (err) {
-        document.getElementById("message").innerText = "Error updating: " + err.message;
-      }
-    });
-
-    function logout() {
-      sessionStorage.clear();
-      localStorage.clear();
-      window.location.href = "index.html";
-    }
-  </script>
+  <script src="update.js"></script>
 </body>
 </html>
