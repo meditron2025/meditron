@@ -5,113 +5,56 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Update Prescription</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: rgba(255,255,255,0.8);
+      padding: 20px;
+      border-radius: 8px;
+    }
+    .medication-block {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+    }
+    #message {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
     <h1>Update Prescription</h1>
+    
     <form id="update-form">
+      <!-- ✅ Diagnosis Field -->
       <label for="diagnosis">Diagnosis:</label><br>
-      <textarea name="diagnosis" id="diagnosis" rows="3" required></textarea><br><br>
+      <textarea id="diagnosis" name="diagnosis" rows="3" style="width: 100%;" required></textarea><br><br>
 
       <h3>Medications:</h3>
       <div id="medications">
-        <!-- Medication Blocks -->
-        <div>
-          <label><input type="checkbox" name="med" value="Panadol"> Panadol</label><br>
-          Dose: <input type="text" name="dose-Panadol"><br>
-          Time:
-          <label><input type="checkbox" name="time-Panadol-morning"> Morning</label>
-          <label><input type="checkbox" name="time-Panadol-afternoon"> Afternoon</label>
-          <label><input type="checkbox" name="time-Panadol-night"> Night</label>
-          <hr>
-        </div>
-
-        <div>
-          <label><input type="checkbox" name="med" value="Losartan"> Losartan</label><br>
-          Dose: <input type="text" name="dose-Losartan"><br>
-          Time:
-          <label><input type="checkbox" name="time-Losartan-morning"> Morning</label>
-          <label><input type="checkbox" name="time-Losartan-afternoon"> Afternoon</label>
-          <label><input type="checkbox" name="time-Losartan-night"> Night</label>
-          <hr>
-        </div>
-
-        <div>
-          <label><input type="checkbox" name="med" value="Metformin"> Metformin</label><br>
-          Dose: <input type="text" name="dose-Metformin"><br>
-          Time:
-          <label><input type="checkbox" name="time-Metformin-morning"> Morning</label>
-          <label><input type="checkbox" name="time-Metformin-afternoon"> Afternoon</label>
-          <label><input type="checkbox" name="time-Metformin-night"> Night</label>
-          <hr>
-        </div>
-
-        <div>
-          <label><input type="checkbox" name="med" value="Aspirin"> Aspirin</label><br>
-          Dose: <input type="text" name="dose-Aspirin"><br>
-          Time:
-          <label><input type="checkbox" name="time-Aspirin-morning"> Morning</label>
-          <label><input type="checkbox" name="time-Aspirin-afternoon"> Afternoon</label>
-          <label><input type="checkbox" name="time-Aspirin-night"> Night</label>
-          <hr>
-        </div>
-
-        <div>
-          <label><input type="checkbox" name="med" value="Clopidogrel"> Clopidogrel</label><br>
-          Dose: <input type="text" name="dose-Clopidogrel"><br>
-          Time:
-          <label><input type="checkbox" name="time-Clopidogrel-morning"> Morning</label>
-          <label><input type="checkbox" name="time-Clopidogrel-afternoon"> Afternoon</label>
-          <label><input type="checkbox" name="time-Clopidogrel-night"> Night</label>
-          <hr>
-        </div>
-
-        <div>
-          <label><input type="checkbox" name="med" value="Statin"> Statin</label><br>
-          Dose: <input type="text" name="dose-Statin"><br>
-          Time:
-          <label><input type="checkbox" name="time-Statin-morning"> Morning</label>
-          <label><input type="checkbox" name="time-Statin-afternoon"> Afternoon</label>
-          <label><input type="checkbox" name="time-Statin-night"> Night</label>
-          <hr>
-        </div>
-
-        <div>
-          <label><input type="checkbox" name="med" value="Penicillin"> Penicillin</label><br>
-          Dose: <input type="text" name="dose-Penicillin"><br>
-          Time:
-          <label><input type="checkbox" name="time-Penicillin-morning"> Morning</label>
-          <label><input type="checkbox" name="time-Penicillin-afternoon"> Afternoon</label>
-          <label><input type="checkbox" name="time-Penicillin-night"> Night</label>
-          <hr>
-        </div>
-
-        <div>
-          <label><input type="checkbox" name="med" value="Diuretics"> Diuretics</label><br>
-          Dose: <input type="text" name="dose-Diuretics"><br>
-          Time:
-          <label><input type="checkbox" name="time-Diuretics-morning"> Morning</label>
-          <label><input type="checkbox" name="time-Diuretics-afternoon"> Afternoon</label>
-          <label><input type="checkbox" name="time-Diuretics-night"> Night</label>
-          <hr>
-        </div>
-
-        <div>
-          <label><input type="checkbox" name="med" value="Sulfonylurea"> Sulfonylurea</label><br>
-          Dose: <input type="text" name="dose-Sulfonylurea"><br>
-          Time:
-          <label><input type="checkbox" name="time-Sulfonylurea-morning"> Morning</label>
-          <label><input type="checkbox" name="time-Sulfonylurea-afternoon"> Afternoon</label>
-          <label><input type="checkbox" name="time-Sulfonylurea-night"> Night</label>
-          <hr>
-        </div>
+        <!-- JS will generate medication fields -->
       </div>
 
       <button type="submit">Save Records</button>
     </form>
-    <p id="status"></p>
+
+    <!-- ✅ Status Message -->
+    <p id="message"></p>
+
     <a href="dashboard.html">← Back to Dashboard</a>
   </div>
+
+  <script src="update.js"></script>
+</body>
+</html>
+
 
   <script src="update.js"></script>
 </body>
