@@ -1,57 +1,243 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Update Prescription</title>
-  <link rel="stylesheet" href="style.css">
   <style>
     body {
       font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f7f9f9;
     }
-    .container {
-      max-width: 900px;
-      margin: auto;
-      background: rgba(255,255,255,0.8);
-      padding: 20px;
-      border-radius: 8px;
+    h1 {
+      color: #00796b;
     }
-    .medication-block {
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 6px;
-    }
-    #message {
+    label {
       font-weight: bold;
+      display: block;
+      margin-top: 15px;
+    }
+    input[type="text"] {
+      padding: 6px;
+      font-size: 14px;
+      width: 300px;
+      max-width: 100%;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    #medications-container {
+      overflow-x: auto;
+      margin-top: 20px;
+      max-width: 100%;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 650px; /* forces horizontal scroll if narrow */
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px 8px;
+      text-align: center;
+      font-size: 14px;
+    }
+    th {
+      background-color: #e0f2f1;
+    }
+    td:first-child {
+      width: 40px;
+    }
+    td:nth-child(2) {
+      text-align: left;
+      padding-left: 12px;
+      width: 160px;
+    }
+    td:nth-child(3) input[type="text"] {
+      width: 90px;
+    }
+    button {
+      margin-top: 25px;
+      padding: 12px 24px;
+      font-size: 16px;
+      background-color: #00796b;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #004d40;
+    }
+    #status-message {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    #error-message {
+      color: red;
       margin-top: 10px;
     }
   </style>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
-  <div class="container">
-    <h1>Update Prescription</h1>
-    
-    <form id="update-form">
-      <!-- ✅ Diagnosis Field -->
-      <label for="diagnosis">Diagnosis:</label><br>
-      <textarea id="diagnosis" name="diagnosis" rows="3" style="width: 100%;" required></textarea><br><br>
 
-      <h3>Medications:</h3>
-      <div id="medications">
-        <!-- JS will generate medication fields -->
-      </div>
+  <h1>Update Medical Records</h1>
 
-      <button type="submit">Save Records</button>
-    </form>
-
-    <!-- ✅ Status Message -->
-    <p id="message"></p>
-
-    <a href="dashboard.html">← Back to Dashboard</a>
+  <div>
+    <label for="diagnosis">Diagnosis</label>
+    <input type="text" id="diagnosis" placeholder="Enter diagnosis here" />
   </div>
 
-  <!-- ✅ Make sure to use type="module" -->
-  <script type="module" src="update.js"></script>
+  <div id="medications-container">
+    <table>
+      <thead>
+        <tr>
+          <th>✔</th>
+          <th>Medication</th>
+          <th>Dosage</th>
+          <th>Morning</th>
+          <th>Afternoon</th>
+          <th>Night</th>
+        </tr>
+      </thead>
+      <tbody id="medications-tbody">
+        <!-- JS will inject rows here -->
+      </tbody>
+    </table>
+  </div>
+
+  <button id="save-btn">Save Updates</button>
+  <p id="status-message"></p>
+  <p id="error-message"></p>
+
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCe9mUjwaZvPPpnPwfm6Xcd1uutJLzev10",
+      authDomain: "meditron-pill-dispenser.firebaseapp.com",
+      projectId: "meditron-pill-dispenser",
+      storageBucket: "meditron-pill-dispenser.appspot.com",
+      messagingSenderId: "582584026049",
+      appId: "1:582584026049:web:dacbe477519dbfa978e540"
+    };
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const params = new URLSearchParams(window.location.search);
+    const patientId = params.get("patientId");
+
+    if (!patientId) {
+      document.getElementById("error-message").innerText = "Patient ID missing in URL.";
+      document.getElementById("save-btn").disabled = true;
+    }
+
+    const medicationList = [
+      "Panadol", "Losartan", "Metformin", "Aspirin", 
+      "Clopidogrel", "Statin", "Penicillin", "Diuretics", "Sulfonylurea"
+    ];
+
+    const tbody = document.getElementById("medications-tbody");
+    const diagnosisInput = document.getElementById("diagnosis");
+    const statusMessage = document.getElementById("status-message");
+    const errorMessage = document.getElementById("error-message");
+    const saveBtn = document.getElementById("save-btn");
+
+    // Function to create the table rows for medications
+    function createMedicationRows() {
+      tbody.innerHTML = medicationList.map(med => `
+        <tr>
+          <td><input type="checkbox" id="check-${med}" /></td>
+          <td>${med}</td>
+          <td><input type="text" id="dose-${med}" placeholder="e.g., 500mg" /></td>
+          <td><input type="checkbox" id="morning-${med}" /></td>
+          <td><input type="checkbox" id="afternoon-${med}" /></td>
+          <td><input type="checkbox" id="night-${med}" /></td>
+        </tr>
+      `).join('');
+    }
+
+    createMedicationRows();
+
+    // Load existing patient data & fill form
+    if (patientId) {
+      db.collection("patients").doc(patientId).get()
+        .then(doc => {
+          if (!doc.exists) {
+            errorMessage.innerText = "Patient data not found in database.";
+            saveBtn.disabled = true;
+            return;
+          }
+          const data = doc.data();
+          diagnosisInput.value = data.diagnosis || "";
+
+          if (Array.isArray(data.prescriptions)) {
+            data.prescriptions.forEach(p => {
+              const med = p.name;
+              if (medicationList.includes(med)) {
+                document.getElementById(`check-${med}`).checked = true;
+                document.getElementById(`dose-${med}`).value = p.dose || "";
+                (p.times || []).forEach(time => {
+                  const timeId = time.toLowerCase() + `-${med}`;
+                  const checkbox = document.getElementById(timeId);
+                  if (checkbox) checkbox.checked = true;
+                });
+              }
+            });
+          }
+        })
+        .catch(err => {
+          errorMessage.innerText = "Error loading patient data: " + err.message;
+          saveBtn.disabled = true;
+        });
+    }
+
+    // Save updated prescription to Firestore
+    saveBtn.addEventListener("click", () => {
+      statusMessage.innerText = "";
+      errorMessage.innerText = "";
+
+      const diagnosis = diagnosisInput.value.trim();
+
+      // Collect prescriptions from form
+      const prescriptions = medicationList.reduce((acc, med) => {
+        const isChecked = document.getElementById(`check-${med}`).checked;
+        if (isChecked) {
+          const dose = document.getElementById(`dose-${med}`).value.trim();
+          const times = [];
+          if (document.getElementById(`morning-${med}`).checked) times.push("Morning");
+          if (document.getElementById(`afternoon-${med}`).checked) times.push("Afternoon");
+          if (document.getElementById(`night-${med}`).checked) times.push("Night");
+
+          acc.push({ name: med, dose, times });
+        }
+        return acc;
+      }, []);
+
+      db.collection("patients").doc(patientId).update({
+        diagnosis,
+        prescriptions
+      })
+      .then(() => {
+        statusMessage.style.color = "green";
+        statusMessage.innerText = "Prescription updated successfully!";
+      })
+      .catch(error => {
+        errorMessage.style.color = "red";
+        errorMessage.innerText = "Error updating: " + error.message;
+      });
+    });
+  </script>
+
 </body>
 </html>
+
+
