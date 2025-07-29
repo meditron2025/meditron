@@ -1,11 +1,3 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  updateDoc,
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
 // Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyCe9mUjwaZvPPpnPwfm6Xcd1uutJLzev10",
@@ -16,130 +8,69 @@ const firebaseConfig = {
   appId: "1:582584026049:web:dacbe477519dbfa978e540"
 };
 
-// Initialize Firebase and Firestore
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-// List of medications
-const medicationList = [
-  "Panadol", "Losartan", "Metformin", "Aspirin", "Clopidogrel",
-  "Statin", "Penicillin", "Diuretics", "Sulfonylurea"
-];
+const params = new URLSearchParams(window.location.search);
+const patientId = params.get("patientId");
 
-// Get patient ID from URL
-const urlParams = new URLSearchParams(window.location.search);
-const patientId = urlParams.get("patientId");
+document.getElementById("prescription-form").addEventListener("submit", async function (e) {
+  e.preventDefault();
 
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("update-form");
-  const message = document.getElementById("message");
-  const medicationsDiv = document.getElementById("medications");
-  const diagnosisField = document.getElementById("diagnosis");
+  const diagnosis = document.getElementById("diagnosis").value;
+  const medications = [
+    "Panadol", "Losartan", "Metformin", "Aspirin", "Clopidogrel",
+    "Statin", "Penicillin", "Diuretics", "Sulfonylurea"
+  ];
 
-  if (!patientId) {
-    message.style.color = "red";
-    message.textContent = "❌ No patient ID in URL.";
-    return;
-  }
+  const prescriptions = medications.map(name => {
+    const isChecked = document.getElementById(name).checked;
+    if (!isChecked) return null;
 
-  // Render medications
-  function renderMedications() {
-    medicationsDiv.innerHTML = "";
+    return {
+      name,
+      dose: document.getElementById(`${name}-dose`).value || "N/A",
+      times: [
+        document.getElementById(`${name}-morning`).checked ? "Morning" : null,
+        document.getElementById(`${name}-afternoon`).checked ? "Afternoon" : null,
+        document.getElementById(`${name}-night`).checked ? "Night" : null
+      ].filter(Boolean)
+    };
+  }).filter(Boolean);
 
-    medicationList.forEach((med) => {
-      const block = document.createElement("div");
-      block.className = "medication-block";
+  try {
+    const patientRef = db.collection("patients").doc(patientId);
+    const doc = await patientRef.get();
 
-      block.innerHTML = `
-        <label>
-          <input type="checkbox" name="medications" value="${med}"> ${med}
-        </label><br>
-        Dosage: <input type="text" name="dosage-${med}" placeholder="e.g. 500mg"><br>
-        Time:
-        <label><input type="checkbox" name="time-${med}" value="Morning"> Morning</label>
-        <label><input type="checkbox" name="time-${med}" value="Afternoon"> Afternoon</label>
-        <label><input type="checkbox" name="time-${med}" value="Night"> Night</label>
-      `;
-
-      medicationsDiv.appendChild(block);
-    });
-  }
-
-  // Load existing patient data
-  async function loadPatientData() {
-    try {
-      const docRef = doc(db, "patients", patientId);
-      const docSnap = await getDoc(docRef);
-
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        diagnosisField.value = data.diagnosis || "";
-
-        if (Array.isArray(data.prescriptions)) {
-          data.prescriptions.forEach((presc) => {
-            const medCheckbox = document.querySelector(`input[name="medications"][value="${presc.name}"]`);
-            const doseInput = document.querySelector(`input[name="dosage-${presc.name}"]`);
-            const timeCheckboxes = document.querySelectorAll(`input[name="time-${presc.name}"]`);
-
-            if (medCheckbox) medCheckbox.checked = true;
-            if (doseInput) doseInput.value = presc.dose || "";
-            if (timeCheckboxes) {
-              timeCheckboxes.forEach(cb => {
-                if (presc.times && presc.times.includes(cb.value)) {
-                  cb.checked = true;
-                }
-              });
-            }
-          });
-        }
-      } else {
-        message.style.color = "red";
-        message.textContent = "❌ Patient not found.";
-      }
-    } catch (err) {
-      console.error("Error loading:", err);
-      message.style.color = "red";
-      message.textContent = "❌ Error: " + err.message;
+    if (!doc.exists) {
+      document.getElementById("status").innerText = "Error: Patient not found.";
+      return;
     }
-  }
 
-  // Submit form
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+    const currentData = doc.data();
+    const timestamp = new Date().toISOString();
 
-    const updatedDiagnosis = diagnosisField.value.trim();
-    const updatedPrescriptions = [];
+    const historyEntry = {
+      diagnosis: currentData.diagnosis || "",
+      prescriptions: currentData.prescriptions || [],
+      updatedAt: timestamp
+    };
 
-    medicationList.forEach((med) => {
-      const isSelected = document.querySelector(`input[name="medications"][value="${med}"]`)?.checked;
-      if (isSelected) {
-        const dose = document.querySelector(`input[name="dosage-${med}"]`)?.value.trim() || "";
-        const times = Array.from(document.querySelectorAll(`input[name="time-${med}"]:checked`))
-                          .map(cb => cb.value);
-
-        updatedPrescriptions.push({
-          name: med,
-          dose: dose,
-          times: times
-        });
-      }
+    await patientRef.update({
+      diagnosis,
+      prescriptions,
+      prescriptionHistory: firebase.firestore.FieldValue.arrayUnion(historyEntry)
     });
 
-    try {
-      const docRef = doc(db, "patients", patientId);
-      await updateDoc(docRef, {
-        diagnosis: updatedDiagnosis,
-        prescriptions: updatedPrescriptions
-      });
+    document.getElementById("status").style.color = "green";
+    document.getElementById("status").innerText = "Prescription updated successfully.";
 
-      message.style.color = "green";
-      message.textContent = "✅ Prescription updated successfully!";
-    } catch (err) {
-      console.error("Update error:", err);
-      message.style.color = "red";
-      message.textContent = "❌ Error updating: " + err.message;
-    }
-  });
+  } catch (err) {
+    document.getElementById("status").style.color = "red";
+    document.getElementById("status").innerText = "Error updating: " + err.message;
+  }
+});
+
 
   // Load everything
   renderMedications();
