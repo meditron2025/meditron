@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Meditron Patient Tablet</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f9ff;
+      text-align: center;
+      padding-top: 50px;
+    }
+
+    h1 {
+      color: #2c3e50;
+    }
+
+    .patient-button {
+      display: block;
+      width: 250px;
+      margin: 20px auto;
+      padding: 15px;
+      font-size: 18px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .patient-button:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <h1>Select Patient for Consultation</h1>
+
+  <button class="patient-button" onclick="joinRoom('MeditronPatient1')">Patient 1</button>
+  <button class="patient-button" onclick="joinRoom('MeditronPatient2')">Patient 2</button>
+  <button class="patient-button" onclick="joinRoom('MeditronPatient3')">Patient 3</button>
+  <button class="patient-button" onclick="joinRoom('MeditronPatient4')">Patient 4</button>
+  <button class="patient-button" onclick="joinRoom('MeditronPatient5')">Patient 5</button>
+  <button class="patient-button" onclick="joinRoom('MeditronPatient6')">Patient 6</button>
+
+  <script>
+    function joinRoom(roomName) {
+      window.location.href = `patient-call.html?room=${roomName}`;
+    }
+  </script>
+</body>
+</html>
