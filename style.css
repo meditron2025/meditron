@@ -182,5 +182,21 @@ button:hover {
 .logout-btn:hover {
   background-color: #c0392b;
 }
+.footer {
+  background-color: #f8f9fa;
+  color: #333;
+  text-align: center;
+  padding: 15px 0;
+  font-size: 14px;
+  border-top: 1px solid #ddd;
+  position: relative;
+  bottom: 0;
+  width: 100%;
+}
+
+.footer .neomedix {
+  color: #007b8f; /* medical blue */
+  font-weight: 600;
+}
 
 
