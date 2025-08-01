@@ -1,52 +1,83 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Meditron Patient Tablet</title>
+  <title>Meditron – Patient Menu</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f9ff;
+      font-family: 'Inter', sans-serif;
+      background-color: #eaf6f9;
+      margin: 0;
+      padding: 0;
       text-align: center;
-      padding-top: 50px;
     }
 
-    h1 {
-      color: #2c3e50;
+    header {
+      background-color: #006994;
+      color: white;
+      padding: 20px;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    h2 {
+      margin-top: 30px;
+      color: #333;
+    }
+
+    .button-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 30px;
     }
 
     .patient-button {
-      display: block;
-      width: 250px;
-      margin: 20px auto;
-      padding: 15px;
-      font-size: 18px;
-      background-color: #3498db;
+      background-color: #00a8cc;
       color: white;
       border: none;
-      border-radius: 8px;
+      padding: 20px 30px;
+      margin: 15px;
+      font-size: 18px;
+      border-radius: 12px;
+      width: 200px;
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
 
     .patient-button:hover {
-      background-color: #2980b9;
+      background-color: #0084a6;
+    }
+
+    .footer {
+      margin-top: 40px;
+      font-size: 14px;
+      color: #888;
     }
   </style>
 </head>
 <body>
-  <h1>Select Patient for Consultation</h1>
 
-  <button class="patient-button" onclick="joinRoom('MeditronPatient1')">Patient 1</button>
-  <button class="patient-button" onclick="joinRoom('MeditronPatient2')">Patient 2</button>
-  <button class="patient-button" onclick="joinRoom('MeditronPatient3')">Patient 3</button>
-  <button class="patient-button" onclick="joinRoom('MeditronPatient4')">Patient 4</button>
-  <button class="patient-button" onclick="joinRoom('MeditronPatient5')">Patient 5</button>
-  <button class="patient-button" onclick="joinRoom('MeditronPatient6')">Patient 6</button>
+  <header>Meditron – Virtual Consultations</header>
+
+  <h2>Select Patient to Join Video Call</h2>
+
+  <div class="button-container">
+    <button class="patient-button" onclick="joinRoom('room-Med1-x8t92')">Patient 1</button>
+    <button class="patient-button" onclick="joinRoom('room-Med2-lk30v')">Patient 2</button>
+    <button class="patient-button" onclick="joinRoom('room-Med3-wp49s')">Patient 3</button>
+    <button class="patient-button" onclick="joinRoom('room-Med4-qz73m')">Patient 4</button>
+    <button class="patient-button" onclick="joinRoom('room-Med5-tu19n')">Patient 5</button>
+    <button class="patient-button" onclick="joinRoom('room-Med6-jr65d')">Patient 6</button>
+  </div>
+
+  <div class="footer">© 2025 Meditron Healthcare</div>
 
   <script>
     function joinRoom(roomName) {
       window.location.href = `patient-call.html?room=${roomName}`;
     }
   </script>
+
 </body>
 </html>
