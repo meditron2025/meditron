@@ -49,10 +49,19 @@
       background-color: #0084a6;
     }
 
-    .footer {
-      margin-top: 40px;
+    footer {
+      background-color: #f8f9fa;
+      color: #333;
+      text-align: center;
+      padding: 15px 0;
       font-size: 14px;
-      color: #888;
+      border-top: 1px solid #ddd;
+      margin-top: 60px;
+    }
+
+    footer .neomedix {
+      color: #007b8f;
+      font-weight: 600;
     }
   </style>
 </head>
@@ -71,7 +80,9 @@
     <button class="patient-button" onclick="joinRoom('room-Med6-jr65d')">Patient 6</button>
   </div>
 
-  <div class="footer">© 2025 Meditron Healthcare</div>
+  <footer>
+    © 2025 <strong>Meditron Healthcare</strong> by <span class="neomedix">NeoMedix</span>
+  </footer>
 
   <script>
     function joinRoom(roomName) {
