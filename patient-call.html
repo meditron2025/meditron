@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Join Patient Consultation</title>
+  <title>Patient Video Call</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f3f9ff;
+      background-color: #f0fff0;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -14,8 +14,7 @@
     }
 
     h1 {
-      color: #005799;
-      margin-bottom: 20px;
+      color: #009688;
     }
 
     select, button {
@@ -28,34 +27,34 @@
     }
 
     button {
-      background-color: #0077cc;
+      background-color: #26a69a;
       color: white;
       border: none;
       cursor: pointer;
     }
 
     button:hover {
-      background-color: #005fa3;
+      background-color: #1d8d82;
     }
   </style>
 </head>
 <body>
-  <h1>Join Virtual Consultation</h1>
+  <h1>Join Doctor Consultation</h1>
 
   <select id="patientSelect">
     <option value="">Select Patient</option>
-    <option value="MeditronConsult-patient1">Patient 1</option>
-    <option value="MeditronConsult-patient2">Patient 2</option>
-    <option value="MeditronConsult-patient3">Patient 3</option>
-    <option value="MeditronConsult-patient4">Patient 4</option>
-    <option value="MeditronConsult-patient5">Patient 5</option>
-    <option value="MeditronConsult-patient6">Patient 6</option>
+    <option value="MeditronRoom1">Patient 1</option>
+    <option value="MeditronRoom2">Patient 2</option>
+    <option value="MeditronRoom3">Patient 3</option>
+    <option value="MeditronRoom4">Patient 4</option>
+    <option value="MeditronRoom5">Patient 5</option>
+    <option value="MeditronRoom6">Patient 6</option>
   </select>
 
-  <button onclick="joinConsultation()">Join Consultation</button>
+  <button onclick="joinCall()">Join Call</button>
 
   <script>
-    function joinConsultation() {
+    function joinCall() {
       const room = document.getElementById("patientSelect").value;
       if (room) {
         const url = `https://meet.jit.si/${room}`;
@@ -67,3 +66,4 @@
   </script>
 </body>
 </html>
+
