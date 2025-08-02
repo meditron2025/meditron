@@ -134,12 +134,12 @@
           return;
         }
 
-        const currentData = doc.data();
         const timestamp = new Date().toISOString();
 
+        // ✅ FIXED: Store new data in history
         const historyEntry = {
-          diagnosis: currentData.diagnosis || "",
-          prescriptions: currentData.prescriptions || [],
+          diagnosis: diagnosis,
+          prescriptions: prescriptions,
           updatedAt: timestamp
         };
 
