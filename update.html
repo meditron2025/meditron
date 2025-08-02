@@ -45,9 +45,26 @@
       border-bottom: 1px solid #ddd;
       padding: 10px 0;
     }
+    #back-button {
+      text-decoration: none;
+    }
+    #back-button button {
+      background-color: #ccc;
+      color: #333;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
+
+  <!-- ✅ BACK BUTTON -->
+  <a id="back-button" href="#">
+    <button>← Back to Patient Page</button>
+  </a>
 
   <h2>Update Medical Record</h2>
 
@@ -82,6 +99,9 @@
 
     const params = new URLSearchParams(window.location.search);
     const patientId = params.get("patientId");
+
+    // ✅ Set Back Button Link
+    document.getElementById("back-button").href = `patient.html?patientId=${patientId}`;
 
     const medications = [
       "Panadol", "Losartan", "Metformin", "Aspirin", "Clopidogrel",
