@@ -45,26 +45,9 @@
       border-bottom: 1px solid #ddd;
       padding: 10px 0;
     }
-    #back-button {
-      text-decoration: none;
-    }
-    #back-button button {
-      background-color: #ccc;
-      color: #333;
-      padding: 10px 16px;
-      border: none;
-      border-radius: 6px;
-      margin-bottom: 20px;
-      cursor: pointer;
-    }
   </style>
 </head>
 <body>
-
-  <!-- ✅ BACK BUTTON -->
-  <a id="back-button" href="#">
-    <button>← Back to Patient Page</button>
-  </a>
 
   <h2>Update Medical Record</h2>
 
@@ -100,9 +83,6 @@
     const params = new URLSearchParams(window.location.search);
     const patientId = params.get("patientId");
 
-    // ✅ Set Back Button Link
-    document.getElementById("back-button").href = `patient.html?patientId=${patientId}`;
-
     const medications = [
       "Panadol", "Losartan", "Metformin", "Aspirin", "Clopidogrel",
       "Statin", "Penicillin", "Diuretics", "Sulfonylurea"
@@ -136,11 +116,11 @@
 
         return {
           name,
-          dose: document.getElementById(`${name}-dose`).value || "N/A",
+          dose: document.getElementById(${name}-dose).value || "N/A",
           times: [
-            document.getElementById(`${name}-morning`).checked ? "Morning" : null,
-            document.getElementById(`${name}-afternoon`).checked ? "Afternoon" : null,
-            document.getElementById(`${name}-night`).checked ? "Night" : null
+            document.getElementById(${name}-morning).checked ? "Morning" : null,
+            document.getElementById(${name}-afternoon).checked ? "Afternoon" : null,
+            document.getElementById(${name}-night).checked ? "Night" : null
           ].filter(Boolean)
         };
       }).filter(Boolean);
@@ -202,13 +182,13 @@
 
             const time = entry.updatedAt ? new Date(entry.updatedAt).toLocaleString() : "Unknown time";
 
-            let html = `<strong>Update #${history.length - index}</strong><br/>`;
-            html += `<em>${time}</em><br/>`;
-            html += `<strong>Diagnosis:</strong> ${entry.diagnosis || "N/A"}<br/>`;
-            html += `<strong>Prescriptions:</strong><ul>`;
+            let html = <strong>Update #${history.length - index}</strong><br/>;
+            html += <em>${time}</em><br/>;
+            html += <strong>Diagnosis:</strong> ${entry.diagnosis || "N/A"}<br/>;
+            html += <strong>Prescriptions:</strong><ul>;
 
             (entry.prescriptions || []).forEach(pres => {
-              html += `<li>${pres.name} - ${pres.dose} - [${(pres.times || []).join(", ")}]</li>`;
+              html += <li>${pres.name} - ${pres.dose} - [${(pres.times || []).join(", ")}]</li>;
             });
 
             html += "</ul>";
