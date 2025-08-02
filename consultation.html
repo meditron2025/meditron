@@ -3,126 +3,54 @@
 <head>
   <title>Doctor Consultation | Meditron</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
-      font-family: 'Segoe UI', sans-serif;
+      font-family: Arial, sans-serif;
       background-color: #f4fcff;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-
-    header {
-      background-color: #006994;
-      color: white;
       padding: 20px;
       text-align: center;
-      font-size: 24px;
-      font-weight: 600;
     }
 
-    main {
-      flex: 1;
-      padding: 30px 20px;
-      text-align: center;
-    }
-
-    .card {
-      background: white;
-      padding: 25px;
-      margin: 0 auto 30px;
-      max-width: 500px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      border-radius: 12px;
+    h1 {
+      color: #006994;
     }
 
     select, button {
-      padding: 12px;
+      padding: 10px;
       margin: 10px;
       font-size: 16px;
-      width: 80%;
-      max-width: 300px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-
-    button {
-      background-color: #00a8cc;
-      color: white;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    button:hover {
-      background-color: #0084a6;
     }
 
     #jitsi-container {
-      margin: 0 auto 40px;
-      width: 95%;
-      max-width: 1000px;
+      margin-top: 30px;
+      width: 100%;
       height: 600px;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    footer {
-      background-color: #f8f9fa;
-      color: #333;
-      text-align: center;
-      padding: 15px 0;
-      font-size: 14px;
-      border-top: 1px solid #ddd;
-    }
-
-    footer .neomedix {
-      color: #007b8f;
-      font-weight: 600;
-    }
-
-    @media screen and (max-width: 768px) {
-      #jitsi-container {
-        height: 400px;
-      }
     }
   </style>
 </head>
 <body>
 
-  <header>Meditron – Doctor Virtual Consultation</header>
+  <h1>Meditron – Doctor Virtual Consultation</h1>
 
-  <main>
-    <div class="card">
-      <label for="patientSelect"><strong>Select a patient:</strong></label><br>
-      <select id="patientSelect">
-        <option value="room-Med1-x8t92">Patient 1</option>
-        <option value="room-Med2-lk30v">Patient 2</option>
-        <option value="room-Med3-wp49s">Patient 3</option>
-        <option value="room-Med4-qz73m">Patient 4</option>
-        <option value="room-Med5-tu19n">Patient 5</option>
-        <option value="room-Med6-jr65d">Patient 6</option>
-      </select><br>
+  <label for="patientSelect">Select a patient:</label>
+  <select id="patientSelect">
+    <option value="room-Med1-x8t92">Patient 1</option>
+    <option value="room-Med2-lk30v">Patient 2</option>
+    <option value="room-Med3-wp49s">Patient 3</option>
+    <option value="room-Med4-qz73m">Patient 4</option>
+    <option value="room-Med5-tu19n">Patient 5</option>
+    <option value="room-Med6-jr65d">Patient 6</option>
+  </select>
+  <br>
 
-      <button onclick="startMeeting()">Join Meeting</button>
-    </div>
+  <button onclick="startMeeting()">Join Meeting</button>
 
-    <div id="jitsi-container"></div>
-  </main>
-
-  <footer>
-    © 2025 <strong>Meditron Healthcare</strong> by <span class="neomedix">NeoMedix</span>
-  </footer>
+  <div id="jitsi-container"></div>
 
   <script src='https://meet.jit.si/external_api.js'></script>
   <script>
     function startMeeting() {
       const roomName = document.getElementById("patientSelect").value;
+
       const domain = "meet.jit.si";
       const options = {
         roomName: roomName,
