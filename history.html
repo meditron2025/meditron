@@ -1,0 +1,26 @@
+<!-- history.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Prescription History</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="firebase-config.js"></script> <!-- make sure this exists -->
+  <script src="history.js" defer></script>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    h2 { color: #2c3e50; }
+    .entry {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      padding: 10px;
+    }
+    ul { margin-left: 20px; }
+  </style>
+</head>
+<body>
+  <h2>Prescription History</h2>
+  <div id="historyContainer">Loading...</div>
+</body>
+</html>
