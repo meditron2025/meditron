@@ -69,13 +69,13 @@ button:hover {
 /* === Message === */
 #message {
   margin-top: 12px;
-  color: red;
+  color: green;
   font-weight: bold;
 }
 
 /* === Logo === */
 .meditron-logo {
-  width: 560px;
+  width: 500px;
   height: auto;
   display: block;
   margin: 0 auto 20px auto;
