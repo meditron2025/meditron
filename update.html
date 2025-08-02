@@ -149,8 +149,8 @@
           prescriptionHistory: firebase.firestore.FieldValue.arrayUnion(historyEntry)
         });
 
-        document.getElementById("status").style.color = "green";
-        document.getElementById("status").innerText = "Prescription updated successfully.";
+        document.getElementById("status").style.color = "blue";
+        document.getElementById("status").innerText = "Prescription updated successfully!";
 
         loadPrescriptionHistory(); // reload updated history
 
