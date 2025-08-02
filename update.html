@@ -1,122 +1,70 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Update Prescription</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: #f7f9f9;
+      padding: 20px;
+      background: #f7f9fc;
     }
-    h1 {
-      color: #00796b;
+    h2 {
+      color: #2a5d84;
     }
-    label {
-      font-weight: bold;
-      display: block;
-      margin-top: 15px;
-    }
-    input[type="text"] {
-      padding: 6px;
-      font-size: 14px;
-      width: 300px;
-      max-width: 100%;
-      margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    #medications-container {
-      overflow-x: auto;
-      margin-top: 20px;
-      max-width: 100%;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    form {
       background: #fff;
-      border-radius: 8px;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+    .medication {
+      margin-bottom: 15px;
+      padding: 10px;
       border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fdfdfd;
     }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      min-width: 650px; /* forces horizontal scroll if narrow */
+    .medication label {
+      margin-right: 10px;
     }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 10px 8px;
-      text-align: center;
-      font-size: 14px;
-    }
-    th {
-      background-color: #e0f2f1;
-    }
-    td:first-child {
-      width: 40px;
-    }
-    td:nth-child(2) {
-      text-align: left;
-      padding-left: 12px;
-      width: 160px;
-    }
-    td:nth-child(3) input[type="text"] {
-      width: 90px;
-    }
-    button {
-      margin-top: 25px;
-      padding: 12px 24px;
-      font-size: 16px;
-      background-color: #00796b;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #004d40;
-    }
-    #status-message {
-      margin-top: 15px;
+    #status {
+      margin-top: 10px;
       font-weight: bold;
     }
-    #error-message {
-      color: red;
-      margin-top: 10px;
+    #history-container {
+      padding: 15px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .history-entry {
+      border-bottom: 1px solid #ddd;
+      padding: 10px 0;
     }
   </style>
-
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
-  <h1>Update Medical Records</h1>
+  <h2>Update Medical Record</h2>
 
-  <div>
-    <label for="diagnosis">Diagnosis</label>
-    <input type="text" id="diagnosis" placeholder="Enter diagnosis here" />
+  <form id="prescription-form">
+    <label for="diagnosis"><strong>Diagnosis:</strong></label><br>
+    <input type="text" id="diagnosis" name="diagnosis" required style="width: 100%; margin-bottom: 20px;"><br>
+
+    <div id="medication-list"></div>
+
+    <button type="submit">Submit Update</button>
+    <p id="status"></p>
+  </form>
+
+  <h2>Prescription History</h2>
+  <div id="history-container">
+    <p>Loading history...</p>
   </div>
-
-  <div id="medications-container">
-    <table>
-      <thead>
-        <tr>
-          <th>✔</th>
-          <th>Medication</th>
-          <th>Dosage</th>
-          <th>Morning</th>
-          <th>Afternoon</th>
-          <th>Night</th>
-        </tr>
-      </thead>
-      <tbody id="medications-tbody">
-        <!-- JS will inject rows here -->
-      </tbody>
-    </table>
-  </div>
-
-  <button id="save-btn">Save Updates</button>
-  <p id="status-message"></p>
-  <p id="error-message"></p>
 
   <script>
     // Firebase config
@@ -135,109 +83,127 @@
     const params = new URLSearchParams(window.location.search);
     const patientId = params.get("patientId");
 
-    if (!patientId) {
-      document.getElementById("error-message").innerText = "Patient ID missing in URL.";
-      document.getElementById("save-btn").disabled = true;
-    }
-
-    const medicationList = [
-      "Panadol", "Losartan", "Metformin", "Aspirin", 
-      "Clopidogrel", "Statin", "Penicillin", "Diuretics", "Sulfonylurea"
+    const medications = [
+      "Panadol", "Losartan", "Metformin", "Aspirin", "Clopidogrel",
+      "Statin", "Penicillin", "Diuretics", "Sulfonylurea"
     ];
 
-    const tbody = document.getElementById("medications-tbody");
-    const diagnosisInput = document.getElementById("diagnosis");
-    const statusMessage = document.getElementById("status-message");
-    const errorMessage = document.getElementById("error-message");
-    const saveBtn = document.getElementById("save-btn");
-
-    // Function to create the table rows for medications
-    function createMedicationRows() {
-      tbody.innerHTML = medicationList.map(med => `
-        <tr>
-          <td><input type="checkbox" id="check-${med}" /></td>
-          <td>${med}</td>
-          <td><input type="text" id="dose-${med}" placeholder="e.g., 500mg" /></td>
-          <td><input type="checkbox" id="morning-${med}" /></td>
-          <td><input type="checkbox" id="afternoon-${med}" /></td>
-          <td><input type="checkbox" id="night-${med}" /></td>
-        </tr>
-      `).join('');
+    // Render medication checklist
+    function renderMedications() {
+      const container = document.getElementById("medication-list");
+      medications.forEach(name => {
+        const div = document.createElement("div");
+        div.className = "medication";
+        div.innerHTML = `
+          <label><input type="checkbox" id="${name}"> ${name}</label><br>
+          <label>Dose: <input type="text" id="${name}-dose" placeholder="e.g. 500mg"></label><br>
+          <label><input type="checkbox" id="${name}-morning"> Morning</label>
+          <label><input type="checkbox" id="${name}-afternoon"> Afternoon</label>
+          <label><input type="checkbox" id="${name}-night"> Night</label>
+        `;
+        container.appendChild(div);
+      });
     }
 
-    createMedicationRows();
+    // Submit form and save to Firestore
+    document.getElementById("prescription-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
 
-    // Load existing patient data & fill form
-    if (patientId) {
+      const diagnosis = document.getElementById("diagnosis").value;
+      const prescriptions = medications.map(name => {
+        const isChecked = document.getElementById(name).checked;
+        if (!isChecked) return null;
+
+        return {
+          name,
+          dose: document.getElementById(`${name}-dose`).value || "N/A",
+          times: [
+            document.getElementById(`${name}-morning`).checked ? "Morning" : null,
+            document.getElementById(`${name}-afternoon`).checked ? "Afternoon" : null,
+            document.getElementById(`${name}-night`).checked ? "Night" : null
+          ].filter(Boolean)
+        };
+      }).filter(Boolean);
+
+      try {
+        const patientRef = db.collection("patients").doc(patientId);
+        const doc = await patientRef.get();
+
+        if (!doc.exists) {
+          document.getElementById("status").innerText = "Error: Patient not found.";
+          return;
+        }
+
+        const currentData = doc.data();
+        const timestamp = new Date().toISOString();
+
+        const historyEntry = {
+          diagnosis: currentData.diagnosis || "",
+          prescriptions: currentData.prescriptions || [],
+          updatedAt: timestamp
+        };
+
+        await patientRef.update({
+          diagnosis,
+          prescriptions,
+          prescriptionHistory: firebase.firestore.FieldValue.arrayUnion(historyEntry)
+        });
+
+        document.getElementById("status").style.color = "green";
+        document.getElementById("status").innerText = "Prescription updated successfully.";
+
+        loadPrescriptionHistory(); // reload updated history
+
+      } catch (err) {
+        document.getElementById("status").style.color = "red";
+        document.getElementById("status").innerText = "Error updating: " + err.message;
+      }
+    });
+
+    // Load and display history
+    function loadPrescriptionHistory() {
+      const container = document.getElementById("history-container");
+      container.innerHTML = "Loading...";
+
       db.collection("patients").doc(patientId).get()
         .then(doc => {
-          if (!doc.exists) {
-            errorMessage.innerText = "Patient data not found in database.";
-            saveBtn.disabled = true;
+          const data = doc.data();
+          const history = data.prescriptionHistory || [];
+
+          if (history.length === 0) {
+            container.innerHTML = "<p>No history found.</p>";
             return;
           }
-          const data = doc.data();
-          diagnosisInput.value = data.diagnosis || "";
 
-          if (Array.isArray(data.prescriptions)) {
-            data.prescriptions.forEach(p => {
-              const med = p.name;
-              if (medicationList.includes(med)) {
-                document.getElementById(`check-${med}`).checked = true;
-                document.getElementById(`dose-${med}`).value = p.dose || "";
-                (p.times || []).forEach(time => {
-                  const timeId = time.toLowerCase() + `-${med}`;
-                  const checkbox = document.getElementById(timeId);
-                  if (checkbox) checkbox.checked = true;
-                });
-              }
+          container.innerHTML = "";
+          history.reverse().forEach((entry, index) => {
+            const section = document.createElement("div");
+            section.className = "history-entry";
+
+            const time = entry.updatedAt ? new Date(entry.updatedAt).toLocaleString() : "Unknown time";
+
+            let html = `<strong>Update #${history.length - index}</strong><br/>`;
+            html += `<em>${time}</em><br/>`;
+            html += `<strong>Diagnosis:</strong> ${entry.diagnosis || "N/A"}<br/>`;
+            html += `<strong>Prescriptions:</strong><ul>`;
+
+            (entry.prescriptions || []).forEach(pres => {
+              html += `<li>${pres.name} - ${pres.dose} - [${(pres.times || []).join(", ")}]</li>`;
             });
-          }
+
+            html += "</ul>";
+            section.innerHTML = html;
+            container.appendChild(section);
+          });
         })
         .catch(err => {
-          errorMessage.innerText = "Error loading patient data: " + err.message;
-          saveBtn.disabled = true;
+          container.innerHTML = "Error loading history: " + err.message;
         });
     }
 
-    // Save updated prescription to Firestore
-    saveBtn.addEventListener("click", () => {
-      statusMessage.innerText = "";
-      errorMessage.innerText = "";
-
-      const diagnosis = diagnosisInput.value.trim();
-
-      // Collect prescriptions from form
-      const prescriptions = medicationList.reduce((acc, med) => {
-        const isChecked = document.getElementById(`check-${med}`).checked;
-        if (isChecked) {
-          const dose = document.getElementById(`dose-${med}`).value.trim();
-          const times = [];
-          if (document.getElementById(`morning-${med}`).checked) times.push("Morning");
-          if (document.getElementById(`afternoon-${med}`).checked) times.push("Afternoon");
-          if (document.getElementById(`night-${med}`).checked) times.push("Night");
-
-          acc.push({ name: med, dose, times });
-        }
-        return acc;
-      }, []);
-
-      db.collection("patients").doc(patientId).update({
-        diagnosis,
-        prescriptions
-      })
-      .then(() => {
-        statusMessage.style.color = "green";
-        statusMessage.innerText = "Prescription updated successfully!";
-      })
-      .catch(error => {
-        errorMessage.style.color = "red";
-        errorMessage.innerText = "Error updating: " + error.message;
-      });
-    });
+    // Load everything on page load
+    renderMedications();
+    loadPrescriptionHistory();
   </script>
-
 </body>
 </html>
-
-
