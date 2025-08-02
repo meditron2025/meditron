@@ -1,26 +1,44 @@
-<!-- history.html -->
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Prescription History</title>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-  <script src="firebase-config.js"></script> <!-- make sure this exists -->
+  <title>Patient Prescription History</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="firebase-config.js"></script>
   <script src="history.js" defer></script>
   <style>
-    body { font-family: Arial; padding: 20px; }
-    h2 { color: #2c3e50; }
-    .entry {
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      margin-bottom: 15px;
-      padding: 10px;
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f1f9fc; }
+    h2 { color: #006c91; }
+    .patient-button {
+      display: inline-block;
+      margin: 10px;
+      padding: 12px 20px;
+      background-color: #0099cc;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
     }
-    ul { margin-left: 20px; }
+    .patient-button:hover {
+      background-color: #007fa3;
+    }
+    #historyContainer {
+      margin-top: 30px;
+    }
+    .record {
+      background: #fff;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-left: 4px solid #00a0d1;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .record h3 { margin-top: 0; }
   </style>
 </head>
 <body>
-  <h2>Prescription History</h2>
-  <div id="historyContainer">Loading...</div>
+  <h2>Ward Assistant — Patient Prescription History</h2>
+
+  <div id="patientButtons"></div>
+  <div id="historyContainer">Select a patient to view history.</div>
 </body>
 </html>
