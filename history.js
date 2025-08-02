@@ -1,14 +1,25 @@
 const db = firebase.firestore();
+const patientButtonsDiv = document.getElementById('patientButtons');
+const historyContainer = document.getElementById('historyContainer');
 
-const urlParams = new URLSearchParams(window.location.search);
-const patientId = urlParams.get('patientId');
+// STEP 1: Load patient IDs (assumes patients are named patient1 to patient6)
+const patientIds = ['patient1', 'patient2', 'patient3', 'patient4', 'patient5', 'patient6'];
 
-const container = document.getElementById('historyContainer');
+patientIds.forEach(id => {
+  const btn = document.createElement('button');
+  btn.className = 'patient-button';
+  btn.innerText = id.charAt(0).toUpperCase() + id.slice(1);
+  btn.onclick = () => loadHistory(id);
+  patientButtonsDiv.appendChild(btn);
+});
 
-db.collection('patients').doc(patientId).get()
-  .then(doc => {
+// STEP 2: Load history for a patient
+function loadHistory(patientId) {
+  historyContainer.innerHTML = `<p>Loading history for ${patientId}...</p>`;
+
+  db.collection('patients').doc(patientId).get().then(doc => {
     if (!doc.exists) {
-      container.innerHTML = 'Patient not found.';
+      historyContainer.innerHTML = `<p>No patient found with ID ${patientId}</p>`;
       return;
     }
 
@@ -16,33 +27,29 @@ db.collection('patients').doc(patientId).get()
     const history = data.history || [];
 
     if (history.length === 0) {
-      container.innerHTML = 'No history records found.';
+      historyContainer.innerHTML = `<p>No history available for ${patientId}.</p>`;
       return;
     }
 
-    container.innerHTML = '';
+    historyContainer.innerHTML = `<h3>History for ${patientId}</h3>`;
 
-    history.forEach((entry, index) => {
-      const entryDiv = document.createElement('div');
-      entryDiv.classList.add('entry');
+    history.forEach((record, index) => {
+      const div = document.createElement('div');
+      div.className = 'record';
 
-      const date = new Date(entry.updatedAt).toLocaleString();
+      const prescriptionsHTML = record.prescriptions.map(p => {
+        return `<li>${p.name} - ${p.dose} (${p.times?.join(', ') || 'No time specified'})</li>`;
+      }).join('');
 
-      let html = `<strong>Record ${index + 1}</strong><br><strong>Date:</strong> ${date}<br>`;
-      html += `<strong>Diagnosis:</strong> ${entry.diagnosis || 'N/A'}<br>`;
-      html += `<strong>Prescriptions:</strong><ul>`;
-
-      (entry.prescriptions || []).forEach(p => {
-        html += `<li><strong>${p.name}</strong>: ${p.dose || 'N/A'} (${(p.times || []).join(', ')})</li>`;
-      });
-
-      html += '</ul>';
-
-      entryDiv.innerHTML = html;
-      container.appendChild(entryDiv);
+      div.innerHTML = `
+        <h4>Update ${index + 1} — ${new Date(record.updatedAt).toLocaleString()}</h4>
+        <p><strong>Diagnosis:</strong> ${record.diagnosis}</p>
+        <ul>${prescriptionsHTML}</ul>
+      `;
+      historyContainer.appendChild(div);
     });
-  })
-  .catch(error => {
+  }).catch(error => {
     console.error('Error loading history:', error);
-    container.innerHTML = 'Error loading history.';
+    historyContainer.innerHTML = `<p>Error loading history: ${error.message}</p>`;
   });
+}
