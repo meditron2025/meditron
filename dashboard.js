@@ -31,26 +31,37 @@ function logout() {
   });
 }
 
-// Display clickable patient buttons
+// ✅ Display only ACTIVE patients dynamically
 function loadPatientButtons() {
-  const container = document.getElementById("patient-buttons");
-  db.collection("patients").get().then(snapshot => {
-    if (snapshot.empty) {
-      container.innerHTML = "<p>No patient data found.</p>";
-      return;
-    }
+  const container = document.getElementById("patientGrid"); // updated to match HTML
 
-    snapshot.forEach(doc => {
-      const patientId = doc.id;
-      const btn = document.createElement("button");
-      btn.innerText = patientId;
-      btn.style.margin = "10px";
-      btn.onclick = () => {
-        window.location.href = `patient.html?patientId=${patientId}`;
-      };
-      container.appendChild(btn);
+  db.collection("patients")
+    .where("status", "==", "active")
+    .get()
+    .then(snapshot => {
+      if (snapshot.empty) {
+        container.innerHTML = "<p>No active patients found.</p>";
+        return;
+      }
+
+      snapshot.forEach(doc => {
+        const patientId = doc.id;
+        const patientData = doc.data();
+
+        const btn = document.createElement("button");
+        btn.className = "patient-button"; // reuse your existing style
+        btn.innerText = patientData.name || patientId;
+        btn.onclick = () => {
+          window.location.href = `patient.html?patientId=${patientId}`;
+        };
+
+        container.appendChild(btn);
+      });
+    })
+    .catch(error => {
+      console.error("Error loading patients:", error);
+      container.innerHTML = "<p>Error loading patients.</p>";
     });
-  });
 }
 
 window.onload = loadPatientButtons;
