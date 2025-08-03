@@ -1,81 +1,158 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ward Assistant Dashboard - Meditron</title>
+  <meta charset="UTF-8">
+  <title>Ward Assistant Panel</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f9fc;
-      margin: 0;
-      padding: 0;
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #e6f2f5;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  h1 {
+    margin: 20px 0 10px;
+    font-size: 32px;
+    color: #0077b6;
+  }
+
+  #login-section {
+    background: white;
+    padding: 25px 30px;
+    margin-top: 10px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    text-align: center;
+  }
+
+  #ward-password {
+    padding: 10px;
+    font-size: 16px;
+    width: 250px;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+
+  button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #0077b6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  #login-error {
+    color: red;
+    margin-top: 10px;
+  }
+
+  #content {
+    margin-top: 20px;
+    padding: 10px 20px;
+    width: 100%;
+    max-width: 1200px;
+    overflow-y: auto;
+    height: calc(100vh - 140px);
+  }
+
+  .grid-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+
+  .patient-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 480px;
+    flex: 1 1 45%;
+    overflow-x: auto;
+    position: relative;
+  }
+
+  .patient-card h3 {
+    margin-top: 0;
+    color: #0077b6;
+  }
+
+  .patient-card table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 14px;
+  }
+
+  .patient-card th,
+  .patient-card td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+    word-break: break-word;
+  }
+
+  .updated-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #ff3b3b;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  @media screen and (max-width: 768px) {
+    .grid-container {
+      flex-direction: column;
+      gap: 15px;
     }
-    h2 {
-      color: #003366;
-    }
-    .container {
-      padding: 20px;
-      max-width: 1000px;
-      margin: auto;
-    }
-    .login-section {
-      text-align: center;
-      margin-top: 100px;
-    }
+
     .patient-card {
-      background: #ffffff;
-      border: 2px solid #e0f0ff;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      padding: 15px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      flex: 1 1 100%;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: left;
-    }
-    th {
-      background-color: #f0f8ff;
-    }
-    .new-badge {
-      color: red;
-      font-size: 16px;
-      margin-left: 10px;
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
+  <h1>Ward Panel</h1>
 
-<div class="container">
-
-  <!-- Login Section -->
-  <div id="login-section" class="login-section">
-    <h2>Ward Assistant Login</h2>
-    <input type="password" id="ward-password" placeholder="Enter Password" />
-    <button onclick="checkPassword()">Login</button>
-    <p id="login-error" style="color: red;"></p>
+  <div id="login-section">
+    <label for="ward-password"><strong>Enter Password:</strong></label><br>
+    <input type="password" id="ward-password" placeholder="Enter ward password">
+    <br>
+    <button onclick="checkPassword()">Enter</button>
+    <p id="login-error"></p>
   </div>
 
-  <!-- Main Content Section -->
-  <div id="content" style="display: none;">
-    <h2>Patient Prescriptions</h2>
-    <div id="patient-list"></div>
+  <div id="content" style="display:none;">
+    <div class="grid-container" id="patient-list"></div>
+    <br>
+    <div style="text-align: center;">
+      <button onclick="location.reload()">🔄 Refresh</button>
+    </div>
   </div>
 
-</div>
-
-<!-- Firebase + JS -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-<script src="ward.js"></script>
-
+  <script src="ward.js"></script>
 </body>
 </html>
-
