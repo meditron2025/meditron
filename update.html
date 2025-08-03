@@ -5,6 +5,8 @@
   <title>Update Prescription</title>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <!-- ✅ ADD: jsPDF library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -58,6 +60,10 @@
     <div id="medication-list"></div>
 
     <button type="submit">Submit Update</button>
+
+    <!-- ✅ ADD: PDF Download Button -->
+    <button type="button" id="download-pdf" style="margin-top: 10px;">Download Latest Prescription as PDF</button>
+
     <p id="status"></p>
   </form>
 
@@ -136,7 +142,6 @@
 
         const timestamp = new Date().toISOString();
 
-        // ✅ FIXED: Store new data in history
         const historyEntry = {
           diagnosis: diagnosis,
           prescriptions: prescriptions,
@@ -152,7 +157,7 @@
         document.getElementById("status").style.color = "blue";
         document.getElementById("status").innerText = "Prescription updated successfully!";
 
-        loadPrescriptionHistory(); // reload updated history
+        loadPrescriptionHistory();
 
       } catch (err) {
         document.getElementById("status").style.color = "red";
@@ -201,7 +206,38 @@
         });
     }
 
-    // Load everything on page load
+    // ✅ ADD: PDF download logic
+    document.getElementById("download-pdf").addEventListener("click", async () => {
+      const patientRef = db.collection("patients").doc(patientId);
+      const doc = await patientRef.get();
+      const data = doc.data();
+
+      if (!data) return alert("No patient data found.");
+
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF();
+
+      let y = 10;
+      pdf.setFontSize(14);
+      pdf.text("Latest Prescription Record", 10, y); y += 10;
+
+      pdf.setFontSize(12);
+      pdf.text(`Diagnosis: ${data.diagnosis || "N/A"}`, 10, y); y += 10;
+
+      if ((data.prescriptions || []).length === 0) {
+        pdf.text("No prescriptions available.", 10, y);
+      } else {
+        pdf.text("Prescriptions:", 10, y); y += 8;
+        data.prescriptions.forEach(p => {
+          const line = `- ${p.name} | ${p.dose} | [${(p.times || []).join(", ")}]`;
+          pdf.text(line, 12, y); y += 8;
+        });
+      }
+
+      pdf.save(`${patientId}_prescription.pdf`);
+    });
+
+    // Load on page ready
     renderMedications();
     loadPrescriptionHistory();
   </script>
