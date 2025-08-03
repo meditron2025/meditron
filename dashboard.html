@@ -22,30 +22,12 @@
 
     <h3 style="margin-top: 30px;">Please select a patient to view or update their medical records.</h3>
 
-    <div class="patient-grid">
-      <button class="patient-button">patient1</button>
-      <button class="patient-button">patient2</button>
-      <button class="patient-button">patient3</button>
-      <button class="patient-button">patient4</button>
-      <button class="patient-button">patient5</button>
-      <button class="patient-button">patient6</button>
+    <div class="patient-grid" id="patientGrid">
+      <!-- Patient buttons will be loaded here dynamically -->
     </div>
   </div>
 
-  <script>
-    // Assign click actions to each patient button
-    const buttons = document.querySelectorAll(".patient-button");
-
-    buttons.forEach((button, index) => {
-      button.addEventListener("click", () => {
-        const patientId = `patient${index + 1}`;
-        window.location.href = `patient.html?patientId=${patientId}`;
-      });
-    });
-
-    function logout() {
-      window.location.href = "index.html";
-    }
-  </script>
+  <script src="dashboard.js"></script>
 </body>
 </html>
+
