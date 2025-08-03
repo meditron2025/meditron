@@ -23,58 +23,61 @@ function checkPassword() {
   }
 }
 
-// Load and display all prescriptions
+// Load and display all prescriptions (excluding discharged patients)
 function loadPrescriptions() {
   const container = document.getElementById("patient-list");
-  db.collection("patients").get().then(snapshot => {
-    if (snapshot.empty) {
-      container.innerHTML = "<p>No patients found.</p>";
-      return;
-    }
-
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      const div = document.createElement("div");
-      div.classList.add("patient-card");
-
-      // Check if recently updated (within 1 day)
-      const lastUpdated = data.prescriptionHistory?.length
-        ? data.prescriptionHistory[data.prescriptionHistory.length - 1].updatedAt
-        : null;
-
-      let updateNotice = "";
-      if (lastUpdated) {
-        const lastUpdateTime = new Date(lastUpdated).getTime();
-        const now = Date.now();
-        const oneDay = 24 * 60 * 60 * 1000;
-
-        if (now - lastUpdateTime <= oneDay) {
-  const uniqueId = `notice-${doc.id}`;
-  updateNotice = `<p id="${uniqueId}" class="blink" style="color: green; font-weight: bold;">🔔 New update available!</p>`;
-
-  // After rendering, stop blinking after 10 seconds
-  setTimeout(() => {
-    const el = document.getElementById(uniqueId);
-    if (el) el.classList.remove("blink");
-  }, 10000); // 10 seconds
-}
-
+  db.collection("patients")
+    .where("status", "==", "admitted") // 🔍 Show only admitted patients
+    .get()
+    .then(snapshot => {
+      if (snapshot.empty) {
+        container.innerHTML = "<p>No patients found.</p>";
+        return;
       }
 
-      div.innerHTML = `
-        <h3>Patient ID: ${doc.id}</h3>
-        ${updateNotice}
-        <p><strong>Name:</strong> ${data.name}</p>
-        <p><strong>Diagnosis:</strong> ${data.diagnosis || 'N/A'}</p>
-        <h4>Prescriptions:</h4>
-        ${generatePrescriptionTable(data.prescriptions || [])}
-      `;
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const div = document.createElement("div");
+        div.classList.add("patient-card");
 
-      container.appendChild(div);
+        // Check if recently updated (within 1 day)
+        const lastUpdated = data.prescriptionHistory?.length
+          ? data.prescriptionHistory[data.prescriptionHistory.length - 1].updatedAt
+          : null;
+
+        let updateNotice = "";
+        if (lastUpdated) {
+          const lastUpdateTime = new Date(lastUpdated).getTime();
+          const now = Date.now();
+          const oneDay = 24 * 60 * 60 * 1000;
+
+          if (now - lastUpdateTime <= oneDay) {
+            const uniqueId = `notice-${doc.id}`;
+            updateNotice = `<p id="${uniqueId}" class="blink" style="color: green; font-weight: bold;">🔔 New update available!</p>`;
+
+            // Stop blinking after 10 seconds
+            setTimeout(() => {
+              const el = document.getElementById(uniqueId);
+              if (el) el.classList.remove("blink");
+            }, 10000);
+          }
+        }
+
+        div.innerHTML = `
+          <h3>Patient ID: ${doc.id}</h3>
+          ${updateNotice}
+          <p><strong>Name:</strong> ${data.name}</p>
+          <p><strong>Diagnosis:</strong> ${data.diagnosis || 'N/A'}</p>
+          <h4>Prescriptions:</h4>
+          ${generatePrescriptionTable(data.prescriptions || [])}
+        `;
+
+        container.appendChild(div);
+      });
+    })
+    .catch(err => {
+      console.error("Error loading prescriptions:", err);
     });
-  }).catch(err => {
-    console.error("Error loading prescriptions:", err);
-  });
 }
 
 // Generate HTML table from prescription array
