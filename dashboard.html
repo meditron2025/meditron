@@ -15,37 +15,29 @@
     </h1>
 
     <p class="dashboard-subtitle">-Success access to smarter healthcare-</p>
-
-    <p class="logged-in-doctor">Logged in as: doctor1@meditron.com</p>
+    <p class="logged-in-doctor" id="logged-in-doctor"></p>
 
     <button onclick="logout()">Logout</button>
 
     <h3 style="margin-top: 30px;">Please select a patient to view or update their medical records.</h3>
+    <div id="patient-buttons" class="patient-grid"></div>
 
-    <div class="patient-grid">
-      <button class="patient-button">patient1</button>
-      <button class="patient-button">patient2</button>
-      <button class="patient-button">patient3</button>
-      <button class="patient-button">patient4</button>
-      <button class="patient-button">patient5</button>
-      <button class="patient-button">patient6</button>
-    </div>
+    <h3 style="margin-top: 40px;">Add New Patient</h3>
+    <form id="add-patient-form">
+      <input type="text" id="new-id" placeholder="Patient ID (e.g., patient7)" required>
+      <input type="text" id="new-name" placeholder="Name" required>
+      <input type="number" id="new-age" placeholder="Age" required>
+      <select id="new-gender" required>
+        <option value="">Select Gender</option>
+        <option>Male</option>
+        <option>Female</option>
+      </select>
+      <input type="text" id="new-diagnosis" placeholder="Initial Diagnosis (optional)">
+      <button type="submit">Add Patient</button>
+    </form>
+    <p id="add-status"></p>
   </div>
 
-  <script>
-    // Assign click actions to each patient button
-    const buttons = document.querySelectorAll(".patient-button");
-
-    buttons.forEach((button, index) => {
-      button.addEventListener("click", () => {
-        const patientId = `patient${index + 1}`;
-        window.location.href = `patient.html?patientId=${patientId}`;
-      });
-    });
-
-    function logout() {
-      window.location.href = "index.html";
-    }
-  </script>
+  <script src="dashboard.js"></script>
 </body>
 </html>
