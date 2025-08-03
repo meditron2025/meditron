@@ -50,11 +50,12 @@ document.getElementById("prescription-form").addEventListener("submit", async fu
     const currentData = doc.data();
     const timestamp = new Date().toISOString();
 
-    const historyEntry = {
-      diagnosis: currentData.diagnosis || "",
-      prescriptions: currentData.prescriptions || [],
-      updatedAt: timestamp
-    };
+   const historyEntry = {
+  diagnosis: diagnosis,
+  prescriptions: prescriptions,
+  updatedAt: timestamp
+};
+
 
     await patientRef.update({
       diagnosis,
