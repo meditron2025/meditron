@@ -29,6 +29,9 @@ if (patientId) {
         prescriptionHtml = "N/A";
       }
 
+      // ✅ Generate history HTML
+      const historyHtml = generatePrescriptionHistoryTable(data.prescriptionHistory || []);
+
       detailsDiv.innerHTML = `
         <p><strong>Name:</strong> ${data.name || 'N/A'}</p>
         <p><strong>Age:</strong> ${data.age || 'N/A'}</p>
@@ -36,6 +39,9 @@ if (patientId) {
         <p><strong>Diagnosis:</strong> ${data.diagnosis || 'N/A'}</p>
         <p><strong>Prescriptions:</strong><br>${prescriptionHtml}</p>
         <button onclick="window.location.href='update.html?patientId=${patientId}'">Update Medical Records</button>
+        <hr>
+        <h3>Prescription History</h3>
+        ${historyHtml}
       `;
     } else {
       detailsDiv.innerHTML = "<p>Patient not found in database.</p>";
@@ -45,5 +51,38 @@ if (patientId) {
   });
 } else {
   detailsDiv.innerHTML = "<p>No patient selected.</p>";
+}
+
+// ✅ Function to generate history table
+function generatePrescriptionHistoryTable(history) {
+  if (!Array.isArray(history) || history.length === 0) {
+    return "<p>No previous prescriptions.</p>";
+  }
+
+  let html = "";
+
+  history.forEach((entry, index) => {
+    const timestamp = new Date(entry.updatedAt).toLocaleString();
+
+    html += `
+      <div class="history-entry">
+        <h4>Prescription ${index + 1} (Updated: ${timestamp})</h4>
+        <p><strong>Diagnosis:</strong> ${entry.diagnosis || 'N/A'}</p>
+        <table>
+          <tr><th>Medication</th><th>Dosage</th><th>Time</th></tr>
+          ${entry.prescriptions.map(p => `
+            <tr>
+              <td>${p.name}</td>
+              <td>${p.dose}</td>
+              <td>${Array.isArray(p.times) ? p.times.join(", ") : ''}</td>
+            </tr>
+          `).join("")}
+        </table>
+      </div>
+      <hr>
+    `;
+  });
+
+  return html;
 }
 
