@@ -49,15 +49,7 @@ function loadPrescriptions() {
         const oneDay = 24 * 60 * 60 * 1000;
 
         if (now - lastUpdateTime <= oneDay) {
-          updateNotice = `
-            <p style="
-              color: green; 
-              font-weight: bold; 
-              animation: blink 1s step-start 0s infinite;
-            ">
-              🔔 New update available!
-            </p>
-          `;
+          updateNotice = `<p style="color: green; font-weight: bold; animation: blink 1s infinite;">🔔 New update available!</p>`;
         }
       }
 
@@ -72,6 +64,8 @@ function loadPrescriptions() {
 
       container.appendChild(div);
     });
+  }).catch(err => {
+    console.error("Error loading prescriptions:", err);
   });
 }
 
@@ -103,12 +97,3 @@ function generatePrescriptionTable(prescriptions) {
   table += "</table>";
   return table;
 }
-
-// Add CSS animation for blinking (inject directly into HTML head)
-const style = document.createElement("style");
-style.innerHTML = `
-  @keyframes blink {
-    50% { opacity: 0; }
-  }
-`;
-document.head.appendChild(style);
