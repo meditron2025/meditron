@@ -37,29 +37,28 @@ function loadPrescriptions() {
       const div = document.createElement("div");
       div.classList.add("patient-card");
 
-      // Check if updated recently (within 24 hours)
-      const updatedAt = data.prescriptionHistory?.length
+      // Check if recently updated (within 1 day)
+      const lastUpdated = data.prescriptionHistory?.length
         ? data.prescriptionHistory[data.prescriptionHistory.length - 1].updatedAt
         : null;
 
-      let isRecentlyUpdated = false;
-      if (updatedAt) {
-        const updatedDate = new Date(updatedAt);
-        const now = new Date();
-        const diffHours = (now - updatedDate) / (1000 * 60 * 60);
-        if (diffHours <= 24) {
-          isRecentlyUpdated = true;
+      let updateNotice = "";
+      if (lastUpdated) {
+        const lastUpdateTime = new Date(lastUpdated).getTime();
+        const now = Date.now();
+        const oneDay = 24 * 60 * 60 * 1000;
+
+        if (now - lastUpdateTime <= oneDay) {
+          updateNotice = `<p style="color: green; font-weight: bold;">🔔 New update available!</p>`;
         }
       }
 
       div.innerHTML = `
-        <h3>
-          Patient ID: ${doc.id}
-          ${isRecentlyUpdated ? '<span style="color: red; font-size: 16px;">🆕 Updated</span>' : ''}
-        </h3>
-        <p><strong>Name:</strong> ${data.name || 'N/A'}</p>
+        <h3>Patient ID: ${doc.id}</h3>
+        ${updateNotice}
+        <p><strong>Name:</strong> ${data.name}</p>
         <p><strong>Diagnosis:</strong> ${data.diagnosis || 'N/A'}</p>
-        <h4>Latest Prescription:</h4>
+        <h4>Prescriptions:</h4>
         ${generatePrescriptionTable(data.prescriptions || [])}
       `;
 
@@ -68,7 +67,7 @@ function loadPrescriptions() {
   });
 }
 
-// Generate HTML table from latest prescription array
+// Generate HTML table from prescription array
 function generatePrescriptionTable(prescriptions) {
   if (!Array.isArray(prescriptions) || prescriptions.length === 0) {
     return "<p>No prescriptions.</p>";
@@ -93,6 +92,6 @@ function generatePrescriptionTable(prescriptions) {
     `;
   });
 
-  table += `</table>`;
+  table += "</table>";
   return table;
 }
