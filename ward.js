@@ -32,33 +32,83 @@ function loadPrescriptions() {
       return;
     }
 
-    const now = new Date();
     snapshot.forEach(doc => {
       const data = doc.data();
       const div = document.createElement("div");
       div.classList.add("patient-card");
 
-      // Check for recent update
+      // Check if recently updated (within 1 day)
+      const lastUpdated = data.prescriptionHistory?.length
+        ? data.prescriptionHistory[data.prescriptionHistory.length - 1].updatedAt
+        : null;
+
       let updateNotice = "";
-      if (data.prescriptionHistory && data.prescriptionHistory.length > 0) {
-        const lastEntry = data.prescriptionHistory[data.prescriptionHistory.length - 1];
-        if (lastEntry.updatedAt) {
-          const updatedTime = new Date(lastEntry.updatedAt);
-          const timeDiff = (now - updatedTime) / (1000 * 60 * 60); // in hours
-          if (timeDiff < 24) {
-            updateNotice = `<p class="blink" style="color: green; font-weight: bold;">🔔 New update available!</p>`;
-          }
+      if (lastUpdated) {
+        const lastUpdateTime = new Date(lastUpdated).getTime();
+        const now = Date.now();
+        const oneDay = 24 * 60 * 60 * 1000;
+
+        if (now - lastUpdateTime <= oneDay) {
+          updateNotice = `
+            <p style="
+              color: green; 
+              font-weight: bold; 
+              animation: blink 1s step-start 0s infinite;
+            ">
+              🔔 New update available!
+            </p>
+          `;
         }
       }
 
       div.innerHTML = `
         <h3>Patient ID: ${doc.id}</h3>
+        ${updateNotice}
         <p><strong>Name:</strong> ${data.name}</p>
         <p><strong>Diagnosis:</strong> ${data.diagnosis || 'N/A'}</p>
-        ${updateNotice}
         <h4>Prescriptions:</h4>
         ${generatePrescriptionTable(data.prescriptions || [])}
       `;
 
       container.appendChild(div);
-   
+    });
+  });
+}
+
+// Generate HTML table from prescription array
+function generatePrescriptionTable(prescriptions) {
+  if (!Array.isArray(prescriptions) || prescriptions.length === 0) {
+    return "<p>No prescriptions.</p>";
+  }
+
+  let table = `
+    <table>
+      <tr>
+        <th>Medication</th>
+        <th>Dosage</th>
+        <th>Time</th>
+      </tr>
+  `;
+
+  prescriptions.forEach(p => {
+    table += `
+      <tr>
+        <td>${p.name}</td>
+        <td>${p.dose}</td>
+        <td>${Array.isArray(p.times) ? p.times.join(", ") : ''}</td>
+      </tr>
+    `;
+  });
+
+  table += "</table>";
+  return table;
+}
+
+// Add CSS animation for blinking (inject directly into HTML head)
+const style = document.createElement("style");
+style.innerHTML = `
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+`;
+document.head.appendChild(style);
