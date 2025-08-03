@@ -49,8 +49,16 @@ function loadPrescriptions() {
         const oneDay = 24 * 60 * 60 * 1000;
 
         if (now - lastUpdateTime <= oneDay) {
-          updateNotice = `<p style="color: green; font-weight: bold; animation: blink 1s infinite;">🔔 New update available!</p>`;
-        }
+  const uniqueId = `notice-${doc.id}`;
+  updateNotice = `<p id="${uniqueId}" class="blink" style="color: green; font-weight: bold;">🔔 New update available!</p>`;
+
+  // After rendering, stop blinking after 10 seconds
+  setTimeout(() => {
+    const el = document.getElementById(uniqueId);
+    if (el) el.classList.remove("blink");
+  }, 10000); // 10 seconds
+}
+
       }
 
       div.innerHTML = `
